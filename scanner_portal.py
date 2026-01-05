@@ -26,6 +26,9 @@ from rtl_scanner import (
     DEFAULT_CONFIG, ChannelType
 )
 
+# Import audio streaming module (based on rtl_fm_python, K0NYC/rtl-fm patterns)
+from audio_streamer import AudioManager, Modulation
+
 # Flask app setup
 app = Flask(__name__, template_folder='templates', static_folder='static')
 app.config['SECRET_KEY'] = 'drn-scanner-portal-secret'
@@ -34,6 +37,7 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 # Global scanner instance
 scanner: RTLSDRScanner = None
 transcriber: TranscriptionService = None
+audio_manager: AudioManager = None
 
 # State
 state = {
@@ -41,13 +45,15 @@ state = {
     'recording': False,
     'current_channel': None,
     'signal_detected': False,
-    'recordings': []
+    'recordings': [],
+    'streaming': False,
+    'playback': False
 }
 
 
 def init_scanner():
     """Initialize the scanner with configuration"""
-    global scanner, transcriber
+    global scanner, transcriber, audio_manager
 
     scanner = RTLSDRScanner()
 
@@ -64,10 +70,19 @@ def init_scanner():
     scanner.on_signal_detected = on_signal_detected
     scanner.on_recording_complete = on_recording_complete
 
+    # Initialize audio manager for enhanced streaming
+    recordings_path = DEFAULT_CONFIG.get('paths', {}).get('recordings', 'recordings')
+    audio_manager = AudioManager({
+        'device_index': DEFAULT_CONFIG.get('rtl_sdr', {}).get('device_index', 0),
+        'recordings_dir': recordings_path,
+        'stream_port': 8080
+    })
+
     # Initialize transcription service (lazy load)
     # transcriber = TranscriptionService(model_size="base")
 
     print(f"Scanner initialized with {len(scanner.channels)} channels")
+    print(f"Audio manager ready (VLC stream port: 8080)")
 
 
 def on_signal_detected(channel: Channel):
@@ -99,8 +114,14 @@ def on_recording_complete(recording: Recording):
 # Flask Routes
 @app.route('/')
 def index():
-    """Main scanner interface"""
+    """Main scanner interface (original)"""
     return render_template('scanner.html')
+
+
+@app.route('/v2')
+def index_v2():
+    """Scanner interface v2 (Rdio Scanner style)"""
+    return render_template('scanner_v2.html')
 
 
 @app.route('/api/channels')
@@ -350,7 +371,7 @@ def handle_monitor_stop():
     emit('monitor_response', {'success': True, 'stopped': True})
 
 
-# Audio streaming endpoint
+# Audio streaming endpoint (original)
 @app.route('/api/audio/stream')
 def audio_stream():
     """Stream live audio (experimental)"""
@@ -369,6 +390,92 @@ def audio_stream():
     )
 
 
+# Enhanced Audio Streaming API (using audio_streamer module)
+@app.route('/api/v2/stream/start/<int:channel_num>', methods=['POST'])
+def start_stream(channel_num):
+    """Start enhanced audio streaming with VLC"""
+    if not scanner or not audio_manager:
+        return jsonify({'error': 'Scanner not initialized'}), 500
+
+    channel = scanner.channels.get(channel_num)
+    if not channel:
+        return jsonify({'error': 'Channel not found'}), 404
+
+    data = request.json or {}
+    record = data.get('record', False)
+    stream = data.get('stream', True)
+    playback = data.get('playback', False)
+
+    # Convert frequency from MHz to Hz
+    freq_hz = int(channel.rx_freq * 1_000_000)
+
+    # Determine modulation based on channel type
+    modulation = 'fm'  # Default to narrowband FM
+    if channel.channel_type == ChannelType.DIGITAL:
+        modulation = 'fm'  # DMR uses FM modulation at RF level
+
+    success = audio_manager.start_monitoring(
+        frequency=freq_hz,
+        channel_name=channel.name,
+        modulation=modulation,
+        gain=DEFAULT_CONFIG.get('rtl_sdr', {}).get('gain', 40),
+        squelch=DEFAULT_CONFIG.get('rtl_sdr', {}).get('squelch_level', 0),
+        sample_rate=DEFAULT_CONFIG.get('rtl_sdr', {}).get('sample_rate', 24000),
+        record=record,
+        stream=stream,
+        playback=playback
+    )
+
+    if success:
+        state['streaming'] = stream
+        state['recording'] = record
+        state['playback'] = playback
+        state['current_channel'] = channel_num
+
+        return jsonify({
+            'success': True,
+            'channel': channel_num,
+            'stream_url': f'http://localhost:8080/stream.ogg' if stream else None,
+            'recording': record,
+            'playback': playback
+        })
+
+    return jsonify({'success': False, 'error': 'Failed to start streaming'}), 500
+
+
+@app.route('/api/v2/stream/stop', methods=['POST'])
+def stop_stream():
+    """Stop enhanced audio streaming"""
+    if audio_manager:
+        recording_info = audio_manager.stop_monitoring()
+        state['streaming'] = False
+        state['playback'] = False
+
+        if recording_info:
+            socketio.emit('recording_complete', recording_info)
+            return jsonify({'success': True, 'recording': recording_info})
+
+    return jsonify({'success': True})
+
+
+@app.route('/api/v2/stream/status')
+def stream_status():
+    """Get enhanced stream status"""
+    if audio_manager:
+        status = audio_manager.get_status()
+        return jsonify(status)
+    return jsonify({'error': 'Audio manager not initialized'}), 500
+
+
+@app.route('/api/v2/signal')
+def get_signal_level():
+    """Get current signal level"""
+    if audio_manager:
+        level = audio_manager.rtl.get_signal_level()
+        return jsonify({'signal_level': level})
+    return jsonify({'signal_level': 0})
+
+
 if __name__ == '__main__':
     print("=" * 60)
     print("AT-D578UV RTL-SDR Scanner Web Portal")
@@ -379,6 +486,9 @@ if __name__ == '__main__':
     init_scanner()
 
     print(f"\nStarting server on http://0.0.0.0:5001")
+    print(f"  Original UI: http://0.0.0.0:5001/")
+    print(f"  Scanner v2:  http://0.0.0.0:5001/v2")
+    print(f"  VLC Stream:  http://0.0.0.0:8080/stream.ogg")
     print("=" * 60)
 
     socketio.run(app, host='0.0.0.0', port=5001, debug=True)
