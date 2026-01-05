@@ -1,0 +1,6 @@
+# AT-D578UV Repeater Web Portal Dependencies
+flask>=2.0.0
+flask-socketio>=5.0.0
+pyserial>=3.5
+python-engineio>=4.0.0
+python-socketio>=5.0.0
