@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTL-SDR Scanner - AT-D578UV</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 2px solid #00ff00;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .license {
+            color: #ffff00;
+            font-size: 0.9rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 20px;
+            background: #111;
+            padding: 10px 15px;
+            border: 1px solid #333;
+            margin-bottom: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            border: 1px solid #555;
+        }
+
+        .status-led.active {
+            background: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .status-led.recording {
+            background: #ff0000;
+            box-shadow: 0 0 10px #ff0000;
+            animation: blink 1s infinite;
+        }
+
+        .status-led.signal {
+            background: #ffff00;
+            box-shadow: 0 0 10px #ffff00;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background: #111;
+            border: 1px solid #333;
+            padding: 15px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-size: 1rem;
+            color: #00ff00;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Channel List */
+        .channel-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .channel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .channel-item:hover {
+            background: #1a1a1a;
+            border-color: #00ff00;
+        }
+
+        .channel-item.active {
+            background: #002200;
+            border-color: #00ff00;
+        }
+
+        .channel-item.encrypted {
+            border-left: 3px solid #ff6600;
+        }
+
+        .channel-name {
+            font-weight: bold;
+        }
+
+        .channel-freq {
+            color: #888;
+            font-size: 0.85rem;
+        }
+
+        .channel-badges {
+            display: flex;
+            gap: 5px;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            font-size: 0.7rem;
+            border-radius: 3px;
+        }
+
+        .badge-enc {
+            background: #ff6600;
+            color: #000;
+        }
+
+        .badge-dmr {
+            background: #0066ff;
+            color: #fff;
+        }
+
+        .badge-rx {
+            background: #666;
+            color: #fff;
+        }
+
+        /* Current Channel Display */
+        .current-channel {
+            text-align: center;
+            padding: 30px 20px;
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            margin-bottom: 20px;
+        }
+
+        .current-freq {
+            font-size: 2.5rem;
+            color: #00ff00;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff00;
+        }
+
+        .current-name {
+            font-size: 1.2rem;
+            color: #ffff00;
+            margin-top: 10px;
+        }
+
+        .current-type {
+            color: #888;
+            margin-top: 5px;
+        }
+
+        /* Controls */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: 2px solid #00ff00;
+            background: transparent;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn:hover {
+            background: #00ff00;
+            color: #000;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-record {
+            border-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .btn-record:hover {
+            background: #ff0000;
+            color: #fff;
+        }
+
+        .btn-record.recording {
+            background: #ff0000;
+            color: #fff;
+            animation: blink 1s infinite;
+        }
+
+        .btn-scan {
+            border-color: #ffff00;
+            color: #ffff00;
+        }
+
+        .btn-scan:hover {
+            background: #ffff00;
+            color: #000;
+        }
+
+        /* Signal Meter */
+        .signal-meter {
+            margin-bottom: 20px;
+        }
+
+        .meter-bar {
+            height: 20px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+            position: relative;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #ffff00, #ff0000);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .meter-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        /* Recordings */
+        .recordings-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .recording-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .recording-info {
+            flex: 1;
+        }
+
+        .recording-name {
+            font-weight: bold;
+            color: #00ff00;
+        }
+
+        .recording-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .recording-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-small {
+            padding: 5px 10px;
+            font-size: 0.75rem;
+        }
+
+        /* Transcription */
+        .transcription-box {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .transcription-box:empty::before {
+            content: 'No transcription available';
+            color: #555;
+        }
+
+        /* Log */
+        .log-panel {
+            background: #0a0a0a;
+            border: 1px solid #333;
+            padding: 10px;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.8rem;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .log-time {
+            color: #666;
+        }
+
+        .log-msg {
+            color: #00ff00;
+        }
+
+        .log-entry.signal {
+            color: #ffff00;
+        }
+
+        .log-entry.error {
+            color: #ff0000;
+        }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .filter-tab {
+            padding: 5px 10px;
+            background: transparent;
+            border: 1px solid #333;
+            color: #888;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .filter-tab.active {
+            border-color: #00ff00;
+            color: #00ff00;
+        }
+
+        /* Audio player */
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #111;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #333;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>RTL-SDR Scanner</h1>
+            <div class="license">GMRS: WSKW654</div>
+        </header>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-led" id="ledScanning"></div>
+                <span>SCANNING</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led" id="ledRecording"></div>
+                <span>RECORDING</span>
+            </div>
+            <div class="status-item">
+                <div class="status-led" id="ledSignal"></div>
+                <span>SIGNAL</span>
+            </div>
+            <div class="status-item">
+                <span id="channelCount">-- Channels</span>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Channel List Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Channels</span>
+                </div>
+                <div class="filter-tabs">
+                    <button class="filter-tab active" data-filter="all">All</button>
+                    <button class="filter-tab" data-filter="encrypted">Encrypted</button>
+                    <button class="filter-tab" data-filter="analog">Analog</button>
+                    <button class="filter-tab" data-filter="digital">Digital</button>
+                </div>
+                <div class="channel-list" id="channelList"></div>
+            </div>
+
+            <!-- Main Control Panel -->
+            <div class="panel">
+                <div class="current-channel">
+                    <div class="current-freq" id="currentFreq">----.-----</div>
+                    <div class="current-name" id="currentName">No Channel Selected</div>
+                    <div class="current-type" id="currentType">--</div>
+                </div>
+
+                <div class="signal-meter">
+                    <div class="meter-bar">
+                        <div class="meter-fill" id="signalMeter"></div>
+                    </div>
+                    <div class="meter-labels">
+                        <span>S0</span>
+                        <span>S5</span>
+                        <span>S9</span>
+                        <span>+20</span>
+                        <span>+40</span>
+                    </div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" id="btnMonitor" onclick="toggleMonitor()">Monitor</button>
+                    <button class="btn btn-record" id="btnRecord" onclick="toggleRecord()">Record</button>
+                    <button class="btn btn-scan" id="btnScan" onclick="toggleScan()">Scan All</button>
+                    <button class="btn" onclick="refreshDevices()">Check SDR</button>
+                </div>
+
+                <div class="panel-header">
+                    <span class="panel-title">Activity Log</span>
+                </div>
+                <div class="log-panel" id="logPanel"></div>
+            </div>
+
+            <!-- Recordings Panel -->
+            <div class="panel">
+                <div class="panel-header">
+                    <span class="panel-title">Recordings</span>
+                    <button class="btn btn-small" onclick="refreshRecordings()">Refresh</button>
+                </div>
+                <div class="recordings-list" id="recordingsList"></div>
+
+                <div class="panel-header" style="margin-top: 20px;">
+                    <span class="panel-title">Transcription</span>
+                </div>
+                <div class="transcription-box" id="transcriptionBox"></div>
+
+                <audio id="audioPlayer" controls style="display: none;"></audio>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+        let channels = [];
+        let currentChannel = null;
+        let isMonitoring = false;
+        let isRecording = false;
+        let isScanning = false;
+        let currentFilter = 'all';
+
+        // Socket events
+        socket.on('connect', () => {
+            log('Connected to scanner server');
+            loadChannels();
+            refreshRecordings();
+        });
+
+        socket.on('status', (data) => {
+            isMonitoring = data.scanning;
+            isRecording = data.recording;
+            currentChannel = data.current_channel;
+            updateUI();
+        });
+
+        socket.on('signal_detected', (data) => {
+            log(`Signal detected: ${data.name} (${data.frequency} MHz)`, 'signal');
+            document.getElementById('ledSignal').classList.add('signal');
+            setTimeout(() => {
+                document.getElementById('ledSignal').classList.remove('signal');
+            }, 2000);
+        });
+
+        socket.on('channel_changed', (data) => {
+            currentChannel = data.channel;
+            updateCurrentDisplay(data);
+            log(`Tuned to: ${data.name}`);
+        });
+
+        socket.on('recording_complete', (data) => {
+            log(`Recording saved: ${data.filename}`);
+            refreshRecordings();
+        });
+
+        // Load channels
+        async function loadChannels() {
+            try {
+                const resp = await fetch('/api/channels');
+                channels = await resp.json();
+                document.getElementById('channelCount').textContent = `${channels.length} Channels`;
+                renderChannels();
+            } catch (e) {
+                log('Failed to load channels', 'error');
+            }
+        }
+
+        // Render channel list
+        function renderChannels() {
+            const list = document.getElementById('channelList');
+            let filtered = channels;
+
+            if (currentFilter === 'encrypted') {
+                filtered = channels.filter(c => c.encrypted);
+            } else if (currentFilter === 'analog') {
+                filtered = channels.filter(c => c.type === 'Analog');
+            } else if (currentFilter === 'digital') {
+                filtered = channels.filter(c => c.type === 'Digital');
+            }
+
+            list.innerHTML = filtered.map(ch => `
+                <div class="channel-item ${ch.encrypted ? 'encrypted' : ''} ${ch.number === currentChannel ? 'active' : ''}"
+                     onclick="tuneChannel(${ch.number})">
+                    <div>
+                        <div class="channel-name">${ch.name}</div>
+                        <div class="channel-freq">${ch.frequency.toFixed(5)} MHz</div>
+                    </div>
+                    <div class="channel-badges">
+                        ${ch.encrypted ? '<span class="badge badge-enc">ENC</span>' : ''}
+                        ${ch.type === 'Digital' ? '<span class="badge badge-dmr">DMR</span>' : ''}
+                        ${ch.forbid_tx ? '<span class="badge badge-rx">RX</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                renderChannels();
+            });
+        });
+
+        // Tune to channel
+        async function tuneChannel(num) {
+            try {
+                const resp = await fetch(`/api/tune/${num}`, { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    currentChannel = num;
+                    const ch = channels.find(c => c.number === num);
+                    if (ch) updateCurrentDisplay(ch);
+                    renderChannels();
+                }
+            } catch (e) {
+                log('Failed to tune channel', 'error');
+            }
+        }
+
+        // Update current channel display
+        function updateCurrentDisplay(ch) {
+            document.getElementById('currentFreq').textContent =
+                (ch.frequency || ch.rx_freq || 0).toFixed(5);
+            document.getElementById('currentName').textContent = ch.name || 'Unknown';
+            document.getElementById('currentType').textContent =
+                `${ch.type || 'Unknown'} ${ch.encrypted ? '| ENCRYPTED' : ''}`;
+        }
+
+        // Toggle monitor
+        async function toggleMonitor() {
+            if (isMonitoring) {
+                await fetch('/api/monitor/stop', { method: 'POST' });
+                isMonitoring = false;
+                log('Monitoring stopped');
+            } else {
+                if (!currentChannel) {
+                    log('Select a channel first', 'error');
+                    return;
+                }
+                const resp = await fetch(`/api/monitor/start/${currentChannel}`, { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    isMonitoring = true;
+                    log('Monitoring started');
+                }
+            }
+            updateUI();
+        }
+
+        // Toggle record
+        async function toggleRecord() {
+            if (isRecording) {
+                await fetch('/api/record/stop', { method: 'POST' });
+                isRecording = false;
+                log('Recording stopped');
+            } else {
+                if (!currentChannel) {
+                    log('Select a channel first', 'error');
+                    return;
+                }
+                const resp = await fetch(`/api/record/start/${currentChannel}`, { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    isRecording = true;
+                    log(`Recording to: ${data.filename}`);
+                }
+            }
+            updateUI();
+        }
+
+        // Toggle scan
+        async function toggleScan() {
+            if (isScanning) {
+                await fetch('/api/scan/stop', { method: 'POST' });
+                isScanning = false;
+                log('Scan stopped');
+            } else {
+                const resp = await fetch('/api/scan/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dwell_time: 2.0 })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    isScanning = true;
+                    log('Scan started');
+                }
+            }
+            updateUI();
+        }
+
+        // Refresh RTL-SDR devices
+        async function refreshDevices() {
+            const resp = await fetch('/api/devices');
+            const data = await resp.json();
+            data.devices.forEach(d => log(`Device: ${d}`));
+        }
+
+        // Refresh recordings
+        async function refreshRecordings() {
+            try {
+                const resp = await fetch('/api/recordings');
+                const recordings = await resp.json();
+                const list = document.getElementById('recordingsList');
+
+                list.innerHTML = recordings.map(rec => `
+                    <div class="recording-item">
+                        <div class="recording-info">
+                            <div class="recording-name">${rec.filename}</div>
+                            <div class="recording-meta">${new Date(rec.created).toLocaleString()}</div>
+                        </div>
+                        <div class="recording-actions">
+                            <button class="btn btn-small" onclick="playRecording('${rec.filename}')">Play</button>
+                            <button class="btn btn-small" onclick="transcribeRecording('${rec.filename}')">TXT</button>
+                        </div>
+                    </div>
+                `).join('') || '<div style="color: #666; padding: 20px;">No recordings yet</div>';
+            } catch (e) {
+                log('Failed to load recordings', 'error');
+            }
+        }
+
+        // Play recording
+        function playRecording(filename) {
+            const player = document.getElementById('audioPlayer');
+            player.src = `/api/recordings/${filename}`;
+            player.style.display = 'block';
+            player.play();
+            log(`Playing: ${filename}`);
+        }
+
+        // Transcribe recording
+        async function transcribeRecording(filename) {
+            log(`Transcribing: ${filename}...`);
+            const box = document.getElementById('transcriptionBox');
+            box.textContent = 'Transcribing... (this may take a while)';
+
+            try {
+                const resp = await fetch(`/api/recordings/${filename}/transcribe`, { method: 'POST' });
+                const data = await resp.json();
+                if (data.success) {
+                    box.textContent = data.transcription;
+                    log('Transcription complete');
+                } else {
+                    box.textContent = `Error: ${data.error}`;
+                    log('Transcription failed', 'error');
+                }
+            } catch (e) {
+                box.textContent = 'Transcription service unavailable';
+                log('Transcription service error', 'error');
+            }
+        }
+
+        // Update UI state
+        function updateUI() {
+            const ledScan = document.getElementById('ledScanning');
+            const ledRec = document.getElementById('ledRecording');
+            const btnMonitor = document.getElementById('btnMonitor');
+            const btnRecord = document.getElementById('btnRecord');
+            const btnScan = document.getElementById('btnScan');
+
+            ledScan.classList.toggle('active', isMonitoring || isScanning);
+            ledRec.classList.toggle('recording', isRecording);
+
+            btnMonitor.textContent = isMonitoring ? 'Stop Monitor' : 'Monitor';
+            btnRecord.textContent = isRecording ? 'Stop Record' : 'Record';
+            btnRecord.classList.toggle('recording', isRecording);
+            btnScan.textContent = isScanning ? 'Stop Scan' : 'Scan All';
+        }
+
+        // Log message
+        function log(msg, type = '') {
+            const panel = document.getElementById('logPanel');
+            const time = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-msg">${msg}</span>`;
+            panel.insertBefore(entry, panel.firstChild);
+
+            // Keep only last 100 entries
+            while (panel.children.length > 100) {
+                panel.removeChild(panel.lastChild);
+            }
+        }
+
+        // Simulate signal meter (would be real data in production)
+        setInterval(() => {
+            if (isMonitoring) {
+                const level = Math.random() * 60 + 10;
+                document.getElementById('signalMeter').style.width = `${level}%`;
+            } else {
+                document.getElementById('signalMeter').style.width = '0%';
+            }
+        }, 200);
+
+        // Initial UI update
+        updateUI();
+    </script>
+</body>
+</html>

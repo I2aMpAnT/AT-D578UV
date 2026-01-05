@@ -1,35 +1,248 @@
-# AT-D578UV-software-mic
- AT-D578UV software mic, hex codes, and CAT config info.
+# AT-D578UV Software Mic & RTL-SDR Scanner
 
- Code: https://github.com/jrobertfisher/AT-D578UV-software-mic
+Software microphone emulator and RTL-SDR monitoring portal for the AnyTone AT-D578UVIII dual-band radio.
 
- Wiki: https://github.com/jrobertfisher/AT-D578UV-software-mic/wiki
+## Overview
 
-The AT-D578UV software mic is a software-based solution that emulates the functionality of the physical microphone for the AT-D578UV radio. It utilizes hex codes that correspond to the button presses on the hand microphone to control the radio's operations.
+This project provides two main components:
 
-To capture the hex codes, traffic on the wire between the radio and the physical microphone was sniffed. The communication traffic was intercepted to determine the specific hex codes associated with each physical mic button press. These hex codes represent commands that control various features of the radio, such as zone and channel selection, menu browsing, VFO switching, PTT control, and more.
+1. **Software Microphone** - Desktop GUI that emulates the physical hand microphone via serial/DigiRig
+2. **RTL-SDR Scanner Portal** - Web-based multi-channel monitoring, recording, and transcription system
 
-By emulating the hand microphone's functionality through software, the AT-D578UV software mic provides users with an alternative interface to control the radio. This software-based approach offers flexibility and customization options that may not be available with the physical microphone. This also allows the radio to be used without changing the mic control setting from UART to Volt detection.
+## Features
 
-As for future ideas, one possibility is to explore the integration of the AnyTone BT-01 bluetooth mic. By leveraging the capabilities of the bluetooth mic, it could be possible to create a software-based screen for the radio. This screen could display information such as channel frequencies, signal strength, and other relevant data. Users could interact with this software screen to control the radio and access its features, providing a more intuitive and visually appealing user experience.
+### Software Microphone (Desktop)
+- Full button emulation (PTT, 0-9, *, #, A-D, UP/DOWN)
+- Serial connection via DigiRig or compatible interface
+- Configurable COM port and serial parameters
+- Callsign display overlay
 
-Integrating the AnyTone BT-01 bluetooth mic into the software mic solution would require understanding the communication protocol and command structure of the bluetooth mic. Once the protocol is deciphered, the software mic could send appropriate commands and receive responses from the bluetooth mic, enabling wireless interaction with the radio. If you have any information about this idea, please create an issue.
+### RTL-SDR Scanner Portal (Web)
+- Multi-channel monitoring with RTL-SDR
+- Support for analog FM and DMR digital modes
+- DMR Basic Privacy (ARC4) decryption
+- Audio recording with automatic file management
+- Whisper-based transcription
+- Real-time signal detection
+- Channel scanning with configurable dwell time
+- NAS storage integration for recordings
 
-When running the code, be sure to update the port to the correct one for your digirig. The callsign text can also be updated to your callsign.
+## Hardware Requirements
 
-## Software Mic v1.0 Release Notes - Initial Release
+### For Software Microphone
+- AnyTone AT-D578UVIII radio
+- DigiRig or compatible USB-serial interface
+- Windows/Linux/Mac computer
 
-## Software Mic v1.0.1 Release Notes
-    Fixed image paths
-    Complied an exe and published it to the dist folder (the exe is hard coded for Com Port 4, I'll add a configuration tab to set the port and call sign info soon.)
+### For RTL-SDR Scanner
+- RTL-SDR USB dongle (RTL2832U-based)
+- Raspberry Pi 4 (recommended) or similar SBC
+- Antenna suitable for your frequencies
+- Optional: NAS for recording storage
 
-## Software Mic v1.0.2 Release Notes
-    Changed buttons to include IRP_MJ_DEVICE_CONTROL (IOCTL_SERIAL SET and GET), to make clicks more responsive.
-    Added a .conf file to manage settings.
-    Opens .conf window, then starts connection
-    When settings button is pressed, the serial connection is stopped, when the connect button is pressed, the settings are read from the .conf file and a new connection is started.
-    Added icons.
-    Windows EXE compiled and posted in the dist folder.
+## Quick Start
 
-## Software Mic v1.0.3 Release Notes
-    Fixed bug with B button.
+### Software Microphone (Windows)
+```bash
+# Download the pre-built executable from dist/
+d578uv-win-x64.exe
+```
+
+### RTL-SDR Scanner (Raspberry Pi)
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/I2aMpAnT/AT-D578UV.git
+cd AT-D578UV
+```
+
+2. **Run the setup script:**
+```bash
+chmod +x setup_scanner.sh
+./setup_scanner.sh
+```
+
+3. **Start the scanner:**
+```bash
+cd /opt/at-d578uv-scanner
+source venv/bin/activate
+python scanner_portal.py
+```
+
+4. **Access the web portal:**
+```
+http://<raspberry-pi-ip>:5001
+```
+
+## Configuration
+
+### Channel Configuration
+Export your codeplug channels to CSV from AnyTone CPS software. The scanner reads `DRN_channels.csv` by default.
+
+### Encryption Keys
+Configure encryption keys in `scanner_config.json`:
+```json
+{
+  "encryption_keys": {
+    "KEY1": "YOUR_128BIT_HEX_KEY",
+    "KEY2": "YOUR_128BIT_HEX_KEY"
+  }
+}
+```
+
+### Storage Paths (NAS)
+Modify paths in `scanner_config.json` for your NAS setup:
+```json
+{
+  "paths": {
+    "recordings": "/mnt/nas4/radio/recordings",
+    "transcriptions": "/mnt/nas4/radio/transcriptions",
+    "logs": "/mnt/nas4/radio/logs"
+  }
+}
+```
+
+## Web Portal Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Main scanner interface |
+| `/api/channels` | GET | List all channels |
+| `/api/channels/encrypted` | GET | List encrypted channels |
+| `/api/tune/<num>` | POST | Tune to channel |
+| `/api/monitor/start/<num>` | POST | Start monitoring |
+| `/api/monitor/stop` | POST | Stop monitoring |
+| `/api/record/start/<num>` | POST | Start recording |
+| `/api/record/stop` | POST | Stop recording |
+| `/api/scan/start` | POST | Start channel scan |
+| `/api/recordings` | GET | List recordings |
+| `/api/recordings/<file>/transcribe` | POST | Transcribe recording |
+
+## File Structure
+
+```
+AT-D578UV/
+├── d578uv-gui.py          # Desktop GUI application
+├── d578uv-console.py      # Console testing tool
+├── webportal.py           # DigiRig control web portal
+├── rtl_scanner.py         # RTL-SDR scanner backend
+├── scanner_portal.py      # Scanner web portal
+├── scanner_config.json    # Scanner configuration
+├── setup_scanner.sh       # Raspberry Pi setup script
+├── DRN_channels.csv       # Channel configuration
+├── DRN.data               # Codeplug binary (encryption keys)
+├── templates/
+│   ├── index.html         # DigiRig portal interface
+│   └── scanner.html       # Scanner portal interface
+├── requirements-webportal.txt
+└── requirements-scanner.txt
+```
+
+## Running as a Service
+
+Enable the scanner to start on boot:
+```bash
+sudo systemctl enable rtl-scanner
+sudo systemctl start rtl-scanner
+```
+
+Check status:
+```bash
+sudo systemctl status rtl-scanner
+```
+
+View logs:
+```bash
+journalctl -u rtl-scanner -f
+```
+
+## Dependencies
+
+### System (Raspberry Pi)
+```bash
+sudo apt-get install rtl-sdr librtlsdr-dev sox ffmpeg python3-pip
+```
+
+### Python
+```bash
+pip install -r requirements-scanner.txt
+```
+
+### Optional (Transcription)
+```bash
+pip install openai-whisper
+```
+Note: Whisper is resource-intensive. Use 'tiny' or 'base' model on Raspberry Pi.
+
+## Keyboard Shortcuts (Scanner Portal)
+
+| Key | Action |
+|-----|--------|
+| 0-9 | Tune to channel |
+| Space | Toggle monitor |
+| R | Toggle record |
+| S | Toggle scan |
+
+## Troubleshooting
+
+### RTL-SDR Not Detected
+```bash
+# Check device
+rtl_test -t
+
+# Blacklist kernel driver
+echo 'blacklist dvb_usb_rtl28xxu' | sudo tee /etc/modprobe.d/blacklist-rtlsdr.conf
+sudo modprobe -r dvb_usb_rtl28xxu
+```
+
+### Permission Denied
+```bash
+# Add udev rule
+sudo tee /etc/udev/rules.d/20-rtlsdr.rules << 'EOF'
+SUBSYSTEM=="usb", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="2838", MODE:="0666"
+EOF
+sudo udevadm control --reload-rules
+```
+
+### Audio Issues
+```bash
+# Test audio capture
+rtl_fm -f 146.52M -M fm -s 24000 -g 40 - | play -r 24000 -t raw -e signed -b 16 -c 1 -
+```
+
+## Version History
+
+### v2.0.0 - RTL-SDR Scanner Portal
+- Added RTL-SDR multi-channel monitoring
+- DMR Basic Privacy decryption support
+- Web-based scanner interface
+- Recording and transcription features
+- Raspberry Pi deployment support
+- NAS storage integration
+
+### v1.0.3
+- Fixed bug with B button
+
+### v1.0.2
+- Added configuration file support
+- Settings window for serial parameters
+- IOCTL improvements for button responsiveness
+
+### v1.0.1
+- Fixed image paths
+- Windows executable release
+
+### v1.0.0
+- Initial release
+
+## Legal Notice
+
+This software is intended for monitoring your own radio systems and frequencies you are licensed to use. Ensure compliance with all applicable regulations including FCC Part 95 (GMRS), Part 97 (Amateur), and local laws regarding radio communications.
+
+## License
+
+MIT License - See LICENSE file for details.
+
+## Contributing
+
+Issues and pull requests welcome at: https://github.com/I2aMpAnT/AT-D578UV

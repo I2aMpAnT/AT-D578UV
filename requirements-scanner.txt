@@ -1,0 +1,26 @@
+# AT-D578UV RTL-SDR Scanner Requirements
+# For Raspberry Pi deployment
+
+# Web framework
+flask>=2.0.0
+flask-socketio>=5.0.0
+
+# Serial communication (for DigiRig TX)
+pyserial>=3.5
+
+# WebSocket support
+python-engineio>=4.0.0
+python-socketio>=5.0.0
+
+# Encryption (DMR Basic Privacy)
+pycryptodome>=3.15.0
+
+# Audio processing
+numpy>=1.21.0
+
+# Transcription (optional - heavy on Pi, use 'tiny' or 'base' model)
+# Install separately: pip install openai-whisper
+# openai-whisper>=20230314
+
+# Database for logging (optional)
+# sqlite3 is built into Python
