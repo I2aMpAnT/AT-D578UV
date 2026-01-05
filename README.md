@@ -104,19 +104,46 @@ Modify paths in `scanner_config.json` for your NAS setup:
 
 ## Web Portal Endpoints
 
+### Main Interfaces
+| Endpoint | Description |
+|----------|-------------|
+| `/` | Original scanner interface |
+| `/v2` | Scanner v2 - Rdio Scanner style UI |
+
+### Channel API
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/` | GET | Main scanner interface |
 | `/api/channels` | GET | List all channels |
 | `/api/channels/encrypted` | GET | List encrypted channels |
+| `/api/channels/analog` | GET | List analog channels |
 | `/api/tune/<num>` | POST | Tune to channel |
 | `/api/monitor/start/<num>` | POST | Start monitoring |
 | `/api/monitor/stop` | POST | Stop monitoring |
 | `/api/record/start/<num>` | POST | Start recording |
 | `/api/record/stop` | POST | Stop recording |
 | `/api/scan/start` | POST | Start channel scan |
+| `/api/scan/stop` | POST | Stop channel scan |
+
+### Recordings API
+| Endpoint | Method | Description |
+|----------|--------|-------------|
 | `/api/recordings` | GET | List recordings |
+| `/api/recordings/<file>` | GET | Download recording |
 | `/api/recordings/<file>/transcribe` | POST | Transcribe recording |
+
+### Enhanced Streaming API (v2)
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v2/stream/start/<num>` | POST | Start VLC streaming (options: record, stream, playback) |
+| `/api/v2/stream/stop` | POST | Stop streaming |
+| `/api/v2/stream/status` | GET | Get stream status |
+| `/api/v2/signal` | GET | Get real-time signal level |
+
+### Streaming Ports
+| Port | Service |
+|------|---------|
+| 5001 | Web Portal |
+| 8080 | VLC Audio Stream (`http://host:8080/stream.ogg`) |
 
 ## File Structure
 
@@ -127,13 +154,15 @@ AT-D578UV/
 ├── webportal.py           # DigiRig control web portal
 ├── rtl_scanner.py         # RTL-SDR scanner backend
 ├── scanner_portal.py      # Scanner web portal
+├── audio_streamer.py      # Modular audio streaming (VLC, sox, recording)
 ├── scanner_config.json    # Scanner configuration
 ├── setup_scanner.sh       # Raspberry Pi setup script
 ├── DRN_channels.csv       # Channel configuration
 ├── DRN.data               # Codeplug binary (encryption keys)
 ├── templates/
 │   ├── index.html         # DigiRig portal interface
-│   └── scanner.html       # Scanner portal interface
+│   ├── scanner.html       # Scanner portal interface (original)
+│   └── scanner_v2.html    # Scanner portal interface (Rdio Scanner style)
 ├── requirements-webportal.txt
 └── requirements-scanner.txt
 ```
@@ -211,6 +240,17 @@ rtl_fm -f 146.52M -M fm -s 24000 -g 40 - | play -r 24000 -t raw -e signed -b 16 
 ```
 
 ## Version History
+
+### v2.1.0 - Enhanced Audio Streaming
+- Added `audio_streamer.py` module based on rtl_fm_python, K0NYC/rtl-fm patterns
+- VLC network streaming support (access audio from any device)
+- Real-time signal level monitoring
+- Scanner v2 UI inspired by Rdio Scanner project
+- Professional scanner-style interface with:
+  - Large frequency display with green LED aesthetic
+  - 25-bar signal meter with color gradients
+  - Channel filtering (All/Encrypted/Analog/DMR)
+  - Activity feed and recording management
 
 ### v2.0.0 - RTL-SDR Scanner Portal
 - Added RTL-SDR multi-channel monitoring
