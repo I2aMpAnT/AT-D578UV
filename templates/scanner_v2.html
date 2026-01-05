@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radio Scanner - AT-D578UV</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        /*
+         * Scanner-style UI inspired by Rdio Scanner
+         * https://github.com/chuot/rdio-scanner
+         */
+
+        :root {
+            --bg-dark: #1a1a1a;
+            --bg-panel: #252525;
+            --bg-display: #0d1117;
+            --accent-green: #00ff41;
+            --accent-red: #ff3333;
+            --accent-orange: #ff9500;
+            --accent-blue: #00a8ff;
+            --text-dim: #666;
+            --text-mid: #999;
+            --text-bright: #eee;
+            --border-color: #333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-bright);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Scanner Display - Top Section */
+        .scanner-display {
+            background: var(--bg-display);
+            border-bottom: 3px solid var(--accent-green);
+            padding: 20px;
+        }
+
+        .display-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .scanner-title {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .license-badge {
+            background: var(--accent-orange);
+            color: #000;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .frequency-display {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .frequency-value {
+            font-family: 'Courier New', monospace;
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: var(--accent-green);
+            text-shadow: 0 0 30px rgba(0, 255, 65, 0.5);
+            letter-spacing: 3px;
+        }
+
+        .frequency-unit {
+            font-size: 1.5rem;
+            color: var(--accent-green);
+            opacity: 0.7;
+        }
+
+        .channel-info {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .channel-name {
+            font-size: 1.3rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .channel-mode {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            margin-top: 5px;
+        }
+
+        .channel-mode .encrypted {
+            color: var(--accent-orange);
+            font-weight: bold;
+        }
+
+        /* Signal Meter */
+        .signal-meter-container {
+            max-width: 600px;
+            margin: 20px auto 0;
+        }
+
+        .signal-meter {
+            display: flex;
+            gap: 3px;
+            height: 30px;
+            background: #111;
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .signal-bar {
+            flex: 1;
+            background: #222;
+            border-radius: 2px;
+            transition: background 0.1s;
+        }
+
+        .signal-bar.active.low { background: var(--accent-green); }
+        .signal-bar.active.mid { background: var(--accent-orange); }
+        .signal-bar.active.high { background: var(--accent-red); }
+
+        .signal-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+            padding: 0 5px;
+        }
+
+        /* Status LEDs */
+        .status-leds {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .status-led {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .led {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #333;
+            border: 1px solid #444;
+        }
+
+        .led.on {
+            background: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+        }
+
+        .led.recording {
+            background: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red);
+            animation: blink 1s infinite;
+        }
+
+        .led.streaming {
+            background: var(--accent-blue);
+            box-shadow: 0 0 10px var(--accent-blue);
+        }
+
+        @keyframes blink {
+            50% { opacity: 0.3; }
+        }
+
+        .led-label {
+            font-size: 0.75rem;
+            color: var(--text-mid);
+            text-transform: uppercase;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: grid;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 0;
+            min-height: calc(100vh - 250px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Channel List Panel */
+        .channel-panel {
+            background: var(--bg-panel);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-header {
+            padding: 15px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-mid);
+        }
+
+        .channel-filters {
+            display: flex;
+            gap: 5px;
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 5px 10px;
+            font-size: 0.7rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-mid);
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover { border-color: var(--accent-green); }
+        .filter-btn.active {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
+        }
+
+        .channel-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .channel-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1a1a1a;
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .channel-item:hover { background: #2a2a2a; }
+
+        .channel-item.active {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 3px solid var(--accent-green);
+        }
+
+        .channel-item.has-signal {
+            background: rgba(0, 168, 255, 0.1);
+        }
+
+        .ch-info {
+            flex: 1;
+        }
+
+        .ch-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .ch-freq {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-family: monospace;
+        }
+
+        .ch-badges {
+            display: flex;
+            gap: 5px;
+        }
+
+        .ch-badge {
+            padding: 2px 6px;
+            font-size: 0.65rem;
+            border-radius: 2px;
+            font-weight: bold;
+        }
+
+        .ch-badge.enc { background: var(--accent-orange); color: #000; }
+        .ch-badge.dmr { background: var(--accent-blue); color: #fff; }
+        .ch-badge.rx { background: #444; color: #aaa; }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--bg-panel);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-group {
+            background: var(--bg-dark);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .control-group-title {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .ctrl-btn {
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            background: transparent;
+            color: var(--text-bright);
+            font-size: 0.85rem;
+            font-weight: 500;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .ctrl-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .ctrl-btn.active {
+            background: var(--accent-green);
+            color: #000;
+            border-color: var(--accent-green);
+        }
+
+        .ctrl-btn.record { border-color: var(--accent-red); }
+        .ctrl-btn.record:hover { color: var(--accent-red); }
+        .ctrl-btn.record.active {
+            background: var(--accent-red);
+            color: #fff;
+            animation: blink 1s infinite;
+        }
+
+        /* Volume/Squelch Controls */
+        .slider-control {
+            margin-bottom: 15px;
+        }
+
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-mid);
+            margin-bottom: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #333;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            cursor: pointer;
+        }
+
+        /* Activity Feed */
+        .activity-panel {
+            background: var(--bg-panel);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .activity-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-mid);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .activity-tab.active {
+            color: var(--accent-green);
+            border-bottom: 2px solid var(--accent-green);
+        }
+
+        .activity-content {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .activity-item.signal {
+            border-left: 3px solid var(--accent-blue);
+        }
+
+        .activity-item.recording {
+            border-left: 3px solid var(--accent-red);
+        }
+
+        .activity-time {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: monospace;
+        }
+
+        .activity-msg {
+            font-size: 0.85rem;
+            margin-top: 3px;
+        }
+
+        /* Recording Item */
+        .recording-item {
+            padding: 12px 15px;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        .rec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rec-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .rec-duration {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+        }
+
+        .rec-meta {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+
+        .rec-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .rec-btn {
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-mid);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .rec-btn:hover {
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        /* Audio Player */
+        .audio-player {
+            padding: 15px;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .audio-player audio {
+            width: 100%;
+            height: 35px;
+        }
+
+        /* Transcription */
+        .transcription-box {
+            padding: 15px;
+            background: var(--bg-dark);
+            border-radius: 5px;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            max-height: 200px;
+            overflow-y: auto;
+            color: var(--text-mid);
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-green);
+        }
+    </style>
+</head>
+<body>
+    <!-- Scanner Display -->
+    <div class="scanner-display">
+        <div class="display-header">
+            <div class="scanner-title">RTL-SDR Scanner // AT-D578UV</div>
+            <div class="license-badge">GMRS: WSKW654</div>
+        </div>
+
+        <div class="frequency-display">
+            <span class="frequency-value" id="freqDisplay">----.-----</span>
+            <span class="frequency-unit">MHz</span>
+        </div>
+
+        <div class="channel-info">
+            <div class="channel-name" id="channelName">No Channel Selected</div>
+            <div class="channel-mode" id="channelMode">--</div>
+        </div>
+
+        <div class="signal-meter-container">
+            <div class="signal-meter" id="signalMeter"></div>
+            <div class="signal-labels">
+                <span>S1</span><span>S3</span><span>S5</span><span>S7</span><span>S9</span><span>+20</span><span>+40</span>
+            </div>
+        </div>
+
+        <div class="status-leds">
+            <div class="status-led">
+                <div class="led" id="ledMonitor"></div>
+                <span class="led-label">Monitor</span>
+            </div>
+            <div class="status-led">
+                <div class="led" id="ledRecording"></div>
+                <span class="led-label">Recording</span>
+            </div>
+            <div class="status-led">
+                <div class="led" id="ledStream"></div>
+                <span class="led-label">Stream</span>
+            </div>
+            <div class="status-led">
+                <div class="led" id="ledSignal"></div>
+                <span class="led-label">Signal</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Channel List -->
+        <div class="channel-panel">
+            <div class="panel-header">
+                <span class="panel-title">Channels</span>
+                <span id="channelCount">0</span>
+            </div>
+            <div class="channel-filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="encrypted">Encrypted</button>
+                <button class="filter-btn" data-filter="analog">Analog</button>
+                <button class="filter-btn" data-filter="digital">DMR</button>
+                <button class="filter-btn" data-filter="fav">Favorites</button>
+            </div>
+            <div class="channel-list" id="channelList"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="control-panel">
+            <div class="control-group">
+                <div class="control-group-title">Monitor Controls</div>
+                <div class="control-buttons">
+                    <button class="ctrl-btn" id="btnMonitor" onclick="toggleMonitor()">Monitor</button>
+                    <button class="ctrl-btn record" id="btnRecord" onclick="toggleRecord()">Record</button>
+                    <button class="ctrl-btn" id="btnScan" onclick="toggleScan()">Scan</button>
+                    <button class="ctrl-btn" id="btnStream" onclick="toggleStream()">Stream</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-group-title">Audio Settings</div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Squelch</span>
+                        <span id="squelchValue">0</span>
+                    </div>
+                    <input type="range" class="slider" id="squelchSlider" min="0" max="50" value="0" oninput="setSquelch(this.value)">
+                </div>
+                <div class="slider-control">
+                    <div class="slider-label">
+                        <span>Gain</span>
+                        <span id="gainValue">40</span>
+                    </div>
+                    <input type="range" class="slider" id="gainSlider" min="0" max="50" value="40" oninput="setGain(this.value)">
+                </div>
+            </div>
+
+            <div class="control-group">
+                <div class="control-group-title">Quick Tune</div>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="quickFreq" placeholder="146.520" style="flex:1; padding:10px; background:#1a1a1a; border:1px solid #333; color:#fff; border-radius:5px;">
+                    <button class="ctrl-btn" onclick="quickTune()" style="padding:10px 20px;">Tune</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity & Recordings -->
+        <div class="activity-panel">
+            <div class="activity-tabs">
+                <button class="activity-tab active" data-tab="activity">Activity</button>
+                <button class="activity-tab" data-tab="recordings">Recordings</button>
+                <button class="activity-tab" data-tab="transcribe">Transcribe</button>
+            </div>
+
+            <div class="activity-content" id="activityContent">
+                <!-- Dynamic content -->
+            </div>
+
+            <div class="audio-player" id="audioPlayer" style="display:none;">
+                <audio id="audioElement" controls></audio>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const socket = io();
+
+        // State
+        let channels = [];
+        let currentChannel = null;
+        let isMonitoring = false;
+        let isRecording = false;
+        let isScanning = false;
+        let isStreaming = false;
+        let currentFilter = 'all';
+        let currentTab = 'activity';
+        let activityLog = [];
+        let recordings = [];
+
+        // Create signal meter bars
+        const meterContainer = document.getElementById('signalMeter');
+        for (let i = 0; i < 25; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'signal-bar';
+            bar.dataset.index = i;
+            meterContainer.appendChild(bar);
+        }
+
+        // Socket events
+        socket.on('connect', () => {
+            logActivity('Connected to scanner server');
+            loadChannels();
+            loadRecordings();
+        });
+
+        socket.on('status', updateStatus);
+        socket.on('signal_detected', (data) => {
+            document.getElementById('ledSignal').classList.add('on');
+            setTimeout(() => document.getElementById('ledSignal').classList.remove('on'), 2000);
+            logActivity(`Signal: ${data.name} (${data.frequency} MHz)`, 'signal');
+        });
+
+        socket.on('recording_complete', (data) => {
+            logActivity(`Recording saved: ${data.filename}`, 'recording');
+            loadRecordings();
+        });
+
+        // Load channels
+        async function loadChannels() {
+            try {
+                const resp = await fetch('/api/channels');
+                channels = await resp.json();
+                document.getElementById('channelCount').textContent = channels.length;
+                renderChannels();
+            } catch (e) {
+                logActivity('Failed to load channels', 'error');
+            }
+        }
+
+        // Render channels
+        function renderChannels() {
+            let filtered = channels;
+            if (currentFilter === 'encrypted') filtered = channels.filter(c => c.encrypted);
+            else if (currentFilter === 'analog') filtered = channels.filter(c => c.type === 'Analog');
+            else if (currentFilter === 'digital') filtered = channels.filter(c => c.type === 'Digital');
+
+            const list = document.getElementById('channelList');
+            list.innerHTML = filtered.map(ch => `
+                <div class="channel-item ${ch.number === currentChannel ? 'active' : ''}" onclick="tuneChannel(${ch.number})">
+                    <div class="ch-info">
+                        <div class="ch-name">${ch.name}</div>
+                        <div class="ch-freq">${ch.frequency.toFixed(5)} MHz</div>
+                    </div>
+                    <div class="ch-badges">
+                        ${ch.encrypted ? '<span class="ch-badge enc">ENC</span>' : ''}
+                        ${ch.type === 'Digital' ? '<span class="ch-badge dmr">DMR</span>' : ''}
+                        ${ch.forbid_tx ? '<span class="ch-badge rx">RX</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filter buttons
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderChannels();
+            });
+        });
+
+        // Activity tabs
+        document.querySelectorAll('.activity-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.activity-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                renderActivityContent();
+            });
+        });
+
+        // Tune to channel
+        async function tuneChannel(num) {
+            const resp = await fetch(`/api/tune/${num}`, { method: 'POST' });
+            const data = await resp.json();
+            if (data.success) {
+                currentChannel = num;
+                const ch = channels.find(c => c.number === num);
+                if (ch) updateDisplay(ch);
+                renderChannels();
+                logActivity(`Tuned to: ${ch?.name || num}`);
+            }
+        }
+
+        // Quick tune
+        function quickTune() {
+            const freq = parseFloat(document.getElementById('quickFreq').value);
+            if (freq) {
+                // Find closest channel or tune directly
+                const ch = channels.find(c => Math.abs(c.frequency - freq) < 0.001);
+                if (ch) {
+                    tuneChannel(ch.number);
+                } else {
+                    logActivity(`Direct tune: ${freq} MHz`);
+                }
+            }
+        }
+
+        // Update display
+        function updateDisplay(ch) {
+            document.getElementById('freqDisplay').textContent = ch.frequency.toFixed(5);
+            document.getElementById('channelName').textContent = ch.name;
+            document.getElementById('channelMode').innerHTML =
+                `${ch.type} ${ch.encrypted ? '| <span class="encrypted">ENCRYPTED</span>' : ''}`;
+        }
+
+        // Update status
+        function updateStatus(status) {
+            isMonitoring = status.scanning || status.monitoring;
+            isRecording = status.recording;
+
+            document.getElementById('ledMonitor').classList.toggle('on', isMonitoring);
+            document.getElementById('ledRecording').classList.toggle('recording', isRecording);
+
+            document.getElementById('btnMonitor').classList.toggle('active', isMonitoring);
+            document.getElementById('btnMonitor').textContent = isMonitoring ? 'Stop' : 'Monitor';
+
+            document.getElementById('btnRecord').classList.toggle('active', isRecording);
+            document.getElementById('btnRecord').textContent = isRecording ? 'Stop Rec' : 'Record';
+        }
+
+        // Toggle functions
+        async function toggleMonitor() {
+            if (isMonitoring) {
+                await fetch('/api/monitor/stop', { method: 'POST' });
+                logActivity('Monitoring stopped');
+            } else {
+                if (!currentChannel) { logActivity('Select a channel first'); return; }
+                const resp = await fetch(`/api/monitor/start/${currentChannel}`, { method: 'POST' });
+                if ((await resp.json()).success) logActivity('Monitoring started');
+            }
+            isMonitoring = !isMonitoring;
+            document.getElementById('btnMonitor').classList.toggle('active', isMonitoring);
+            document.getElementById('ledMonitor').classList.toggle('on', isMonitoring);
+        }
+
+        async function toggleRecord() {
+            if (isRecording) {
+                await fetch('/api/record/stop', { method: 'POST' });
+            } else {
+                if (!currentChannel) { logActivity('Select a channel first'); return; }
+                await fetch(`/api/record/start/${currentChannel}`, { method: 'POST' });
+            }
+            isRecording = !isRecording;
+            document.getElementById('btnRecord').classList.toggle('active', isRecording);
+            document.getElementById('ledRecording').classList.toggle('recording', isRecording);
+        }
+
+        async function toggleScan() {
+            if (isScanning) {
+                await fetch('/api/scan/stop', { method: 'POST' });
+                logActivity('Scan stopped');
+            } else {
+                await fetch('/api/scan/start', { method: 'POST' });
+                logActivity('Scanning...');
+            }
+            isScanning = !isScanning;
+            document.getElementById('btnScan').classList.toggle('active', isScanning);
+        }
+
+        function toggleStream() {
+            isStreaming = !isStreaming;
+            document.getElementById('btnStream').classList.toggle('active', isStreaming);
+            document.getElementById('ledStream').classList.toggle('streaming', isStreaming);
+            logActivity(isStreaming ? 'Streaming enabled' : 'Streaming disabled');
+        }
+
+        // Sliders
+        function setSquelch(val) {
+            document.getElementById('squelchValue').textContent = val;
+        }
+
+        function setGain(val) {
+            document.getElementById('gainValue').textContent = val;
+        }
+
+        // Activity log
+        function logActivity(msg, type = '') {
+            const time = new Date().toLocaleTimeString();
+            activityLog.unshift({ time, msg, type });
+            if (activityLog.length > 100) activityLog.pop();
+            if (currentTab === 'activity') renderActivityContent();
+        }
+
+        // Load recordings
+        async function loadRecordings() {
+            try {
+                const resp = await fetch('/api/recordings');
+                recordings = await resp.json();
+                if (currentTab === 'recordings') renderActivityContent();
+            } catch (e) {}
+        }
+
+        // Render activity content
+        function renderActivityContent() {
+            const content = document.getElementById('activityContent');
+
+            if (currentTab === 'activity') {
+                content.innerHTML = activityLog.map(a => `
+                    <div class="activity-item ${a.type}">
+                        <div class="activity-time">${a.time}</div>
+                        <div class="activity-msg">${a.msg}</div>
+                    </div>
+                `).join('') || '<div class="activity-item">No activity yet</div>';
+            } else if (currentTab === 'recordings') {
+                content.innerHTML = recordings.map(r => `
+                    <div class="recording-item">
+                        <div class="rec-header">
+                            <span class="rec-name">${r.filename}</span>
+                        </div>
+                        <div class="rec-meta">${new Date(r.created).toLocaleString()}</div>
+                        <div class="rec-actions">
+                            <button class="rec-btn" onclick="playRecording('${r.filename}')">Play</button>
+                            <button class="rec-btn" onclick="transcribe('${r.filename}')">Transcribe</button>
+                        </div>
+                    </div>
+                `).join('') || '<div class="activity-item">No recordings yet</div>';
+            } else {
+                content.innerHTML = '<div class="transcription-box" id="transcriptionBox">Select a recording to transcribe</div>';
+            }
+        }
+
+        // Play recording
+        function playRecording(filename) {
+            const player = document.getElementById('audioPlayer');
+            const audio = document.getElementById('audioElement');
+            audio.src = `/api/recordings/${filename}`;
+            player.style.display = 'block';
+            audio.play();
+        }
+
+        // Transcribe
+        async function transcribe(filename) {
+            logActivity(`Transcribing: ${filename}...`);
+            document.querySelectorAll('.activity-tab')[2].click(); // Switch to transcribe tab
+
+            const content = document.getElementById('activityContent');
+            content.innerHTML = '<div class="transcription-box">Transcribing... Please wait.</div>';
+
+            try {
+                const resp = await fetch(`/api/recordings/${filename}/transcribe`, { method: 'POST' });
+                const data = await resp.json();
+                content.innerHTML = `<div class="transcription-box">${data.transcription || data.error || 'No result'}</div>`;
+            } catch (e) {
+                content.innerHTML = '<div class="transcription-box">Transcription failed</div>';
+            }
+        }
+
+        // Signal meter animation
+        setInterval(() => {
+            const bars = document.querySelectorAll('.signal-bar');
+            const level = isMonitoring ? Math.random() * 25 : 0;
+
+            bars.forEach((bar, i) => {
+                const isActive = i < level;
+                bar.classList.toggle('active', isActive);
+                bar.classList.remove('low', 'mid', 'high');
+                if (isActive) {
+                    if (i < 10) bar.classList.add('low');
+                    else if (i < 18) bar.classList.add('mid');
+                    else bar.classList.add('high');
+                }
+            });
+        }, 100);
+
+        // Initial render
+        renderActivityContent();
+    </script>
+</body>
+</html>
