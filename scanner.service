@@ -1,0 +1,14 @@
+[Unit]
+Description=AT-D578UV RTL-SDR Scanner
+After=network.target
+
+[Service]
+Type=simple
+User=i2gpi
+WorkingDirectory=/mnt/nas/disk4/CommsStation
+ExecStart=/usr/bin/python3 /mnt/nas/disk4/CommsStation/scanner_portal.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
