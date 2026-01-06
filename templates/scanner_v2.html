@@ -890,19 +890,16 @@
             if (!audioContext || !isAudioStarted) return;
 
             try {
-                // Decode base64 to binary
-                const binaryString = atob(base64Data);
-                const len = binaryString.length;
-                const bytes = new Int16Array(len / 2);
+                // Properly decode base64 to binary using Uint8Array
+                const binary = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0));
+                const dataView = new DataView(binary.buffer);
+                const numSamples = binary.length / 2;
+                const floatData = new Float32Array(numSamples);
 
-                for (let i = 0; i < len; i += 2) {
-                    bytes[i / 2] = (binaryString.charCodeAt(i) | (binaryString.charCodeAt(i + 1) << 8));
-                }
-
-                // Convert to float32 for WebAudio
-                const floatData = new Float32Array(bytes.length);
-                for (let i = 0; i < bytes.length; i++) {
-                    floatData[i] = bytes[i] / 32768.0;
+                // Read as signed 16-bit little-endian PCM
+                for (let i = 0; i < numSamples; i++) {
+                    const sample = dataView.getInt16(i * 2, true);  // true = little-endian
+                    floatData[i] = sample / 32768.0;
                 }
 
                 // Create audio buffer
@@ -916,7 +913,7 @@
 
                 // If we've fallen behind, catch up
                 if (nextPlayTime < audioContext.currentTime) {
-                    nextPlayTime = audioContext.currentTime;
+                    nextPlayTime = audioContext.currentTime + 0.1;  // Add small buffer
                 }
 
                 source.start(nextPlayTime);
