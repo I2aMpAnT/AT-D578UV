@@ -204,6 +204,42 @@ class RTLSDRScanner:
         print(f"Tuned to channel {channel_num}: {self.current_channel.name} ({self.current_channel.rx_freq} MHz)")
         return True
 
+    def tune_frequency(self, freq_mhz: float) -> bool:
+        """Tune directly to a frequency (MHz) and start monitoring"""
+        # Create a temporary channel for direct frequency tuning
+        temp_channel = Channel(
+            number=0,
+            name="Manual Tune",
+            channel_type=ChannelType.ANALOG,
+            rx_freq=freq_mhz,
+            tx_freq=freq_mhz,
+            bandwidth="25K",
+            forbid_tx=True
+        )
+        self.current_channel = temp_channel
+        print(f"Direct tune to {freq_mhz} MHz")
+
+        # Stop any existing monitoring and start on new frequency
+        self.stop_monitoring()
+        freq_hz = int(freq_mhz * 1_000_000)
+
+        # Build rtl_fm command - pipe to aplay for audio output
+        cmd = f"rtl_fm -f {freq_hz} -M fm -s 24000 -g 40 -l 10 | aplay -r 24000 -f S16_LE -t raw -c 1"
+
+        try:
+            self.rtl_process = subprocess.Popen(
+                cmd,
+                shell=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
+            )
+            self.is_scanning = True
+            print(f"Started monitoring {freq_mhz} MHz")
+            return True
+        except Exception as e:
+            print(f"Error starting rtl_fm: {e}")
+            return False
+
     def start_monitoring(self, channel_num: int, output_callback: Optional[Callable] = None):
         """Start monitoring a channel using rtl_fm"""
         if not self.tune_channel(channel_num):

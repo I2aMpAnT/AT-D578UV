@@ -185,6 +185,33 @@ def tune_channel(channel_num):
     return jsonify({'success': False, 'error': 'Channel not found'}), 404
 
 
+@app.route('/api/tune/frequency', methods=['POST'])
+def tune_frequency():
+    """Tune directly to a frequency in MHz"""
+    if not scanner:
+        return jsonify({'error': 'Scanner not initialized'}), 500
+
+    data = request.json or {}
+    freq_mhz = data.get('frequency')
+
+    if not freq_mhz:
+        return jsonify({'error': 'Frequency required'}), 400
+
+    try:
+        freq_mhz = float(freq_mhz)
+    except ValueError:
+        return jsonify({'error': 'Invalid frequency'}), 400
+
+    success = scanner.tune_frequency(freq_mhz)
+    if success:
+        socketio.emit('frequency_changed', {
+            'frequency': freq_mhz,
+            'name': 'Manual Tune'
+        })
+        return jsonify({'success': True, 'frequency': freq_mhz})
+    return jsonify({'success': False, 'error': 'Failed to tune'}), 500
+
+
 @app.route('/api/monitor/start/<int:channel_num>', methods=['POST'])
 def start_monitoring(channel_num):
     """Start monitoring a channel"""

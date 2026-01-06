@@ -997,11 +997,26 @@
             if (ch) {
                 tuneChannel(ch.number);
             } else {
-                // Direct frequency tune - update display
-                document.getElementById('freqDisplay').textContent = freq.toFixed(5);
-                document.getElementById('channelName').textContent = 'Manual Tune';
-                document.getElementById('channelMode').textContent = 'Direct Frequency';
-                logActivity(`Direct tune: ${freq} MHz`);
+                // Direct frequency tune via API
+                const resp = await fetch('/api/tune/frequency', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({frequency: freq})
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    document.getElementById('freqDisplay').textContent = freq.toFixed(5);
+                    document.getElementById('channelName').textContent = 'Manual Tune';
+                    document.getElementById('channelMode').textContent = 'Direct Frequency';
+                    logActivity(`Tuned to ${freq} MHz`);
+                    // Auto-start monitoring
+                    isMonitoring = true;
+                    document.getElementById('btnMonitor').classList.add('active');
+                    document.getElementById('btnMonitor').textContent = 'Stop';
+                    document.getElementById('ledMonitor').classList.add('on');
+                } else {
+                    logActivity(`Failed to tune: ${data.error}`);
+                }
             }
         }
 
