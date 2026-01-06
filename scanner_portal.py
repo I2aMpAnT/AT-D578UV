@@ -491,4 +491,4 @@ if __name__ == '__main__':
     print(f"  VLC Stream:  http://0.0.0.0:8080/stream.ogg")
     print("=" * 60)
 
-    socketio.run(app, host='0.0.0.0', port=5001, debug=True)
+    socketio.run(app, host='0.0.0.0', port=5001, debug=False, allow_unsafe_werkzeug=True)
