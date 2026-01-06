@@ -1006,14 +1006,24 @@
 
         // Tune to channel
         async function tuneChannel(num) {
-            const resp = await fetch(`/api/tune/${num}`, { method: 'POST' });
+            // Initialize audio on user interaction
+            initAudio();
+
+            // Start monitoring directly (which also tunes)
+            const resp = await fetch(`/api/monitor/start/${num}`, { method: 'POST' });
             const data = await resp.json();
             if (data.success) {
                 currentChannel = num;
                 const ch = channels.find(c => c.number === num);
                 if (ch) updateDisplay(ch);
                 renderChannels();
-                logActivity(`Tuned to: ${ch?.name || num}`);
+                logActivity(`Monitoring: ${ch?.name || num}`);
+
+                // Update UI state
+                isMonitoring = true;
+                document.getElementById('btnMonitor').classList.add('active');
+                document.getElementById('btnMonitor').textContent = 'Stop';
+                document.getElementById('ledMonitor').classList.add('on');
             }
         }
 
