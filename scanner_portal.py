@@ -185,6 +185,11 @@ def tune_channel(channel_num):
     return jsonify({'success': False, 'error': 'Channel not found'}), 404
 
 
+def audio_stream_callback(audio_data):
+    """Callback to stream audio data to browser via WebSocket"""
+    socketio.emit('audio_data', {'data': audio_data})
+
+
 @app.route('/api/tune/frequency', methods=['POST'])
 def tune_frequency():
     """Tune directly to a frequency in MHz"""
@@ -202,7 +207,8 @@ def tune_frequency():
     except ValueError:
         return jsonify({'error': 'Invalid frequency'}), 400
 
-    success = scanner.tune_frequency(freq_mhz)
+    # Pass callback to stream audio to browser
+    success = scanner.tune_frequency(freq_mhz, audio_callback=audio_stream_callback)
     if success:
         socketio.emit('frequency_changed', {
             'frequency': freq_mhz,

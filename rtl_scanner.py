@@ -204,7 +204,7 @@ class RTLSDRScanner:
         print(f"Tuned to channel {channel_num}: {self.current_channel.name} ({self.current_channel.rx_freq} MHz)")
         return True
 
-    def tune_frequency(self, freq_mhz: float) -> bool:
+    def tune_frequency(self, freq_mhz: float, audio_callback: Optional[Callable] = None) -> bool:
         """Tune directly to a frequency (MHz) and start monitoring"""
         # Create a temporary channel for direct frequency tuning
         temp_channel = Channel(
@@ -217,28 +217,59 @@ class RTLSDRScanner:
             forbid_tx=True
         )
         self.current_channel = temp_channel
+        self.audio_callback = audio_callback
         print(f"Direct tune to {freq_mhz} MHz")
 
         # Stop any existing monitoring and start on new frequency
         self.stop_monitoring()
         freq_hz = int(freq_mhz * 1_000_000)
 
-        # Build rtl_fm command - pipe to aplay for audio output
-        cmd = f"rtl_fm -f {freq_hz} -M fm -s 24000 -g 40 -l 10 | aplay -r 24000 -f S16_LE -t raw -c 1"
+        # Build rtl_fm command - capture stdout for streaming
+        cmd = [
+            'rtl_fm',
+            '-f', str(freq_hz),
+            '-M', 'fm',
+            '-s', '24000',
+            '-g', '40',
+            '-l', '10',
+            '-'
+        ]
 
         try:
             self.rtl_process = subprocess.Popen(
                 cmd,
-                shell=True,
-                stdout=subprocess.DEVNULL,
+                stdout=subprocess.PIPE,
                 stderr=subprocess.DEVNULL
             )
             self.is_scanning = True
             print(f"Started monitoring {freq_mhz} MHz")
+
+            # Start audio streaming thread
+            if audio_callback:
+                threading.Thread(
+                    target=self._stream_audio,
+                    args=(audio_callback,),
+                    daemon=True
+                ).start()
+
             return True
         except Exception as e:
             print(f"Error starting rtl_fm: {e}")
             return False
+
+    def _stream_audio(self, callback: Callable):
+        """Stream audio data to callback"""
+        import base64
+        while self.rtl_process and self.is_scanning:
+            try:
+                # Read chunks of audio data
+                data = self.rtl_process.stdout.read(4096)
+                if data and callback:
+                    # Send as base64 for WebSocket
+                    callback(base64.b64encode(data).decode('ascii'))
+            except Exception as e:
+                print(f"Audio stream error: {e}")
+                break
 
     def start_monitoring(self, channel_num: int, output_callback: Optional[Callable] = None):
         """Start monitoring a channel using rtl_fm"""

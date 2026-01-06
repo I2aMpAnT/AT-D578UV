@@ -895,11 +895,67 @@
             meterContainer.appendChild(bar);
         }
 
+        // WebAudio setup for browser audio playback
+        let audioContext = null;
+        let audioQueue = [];
+        let isPlaying = false;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 24000
+                });
+                logActivity('Audio initialized');
+            }
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+        }
+
+        function playAudioChunk(base64Data) {
+            if (!audioContext) return;
+
+            try {
+                // Decode base64 to binary
+                const binaryString = atob(base64Data);
+                const len = binaryString.length;
+                const bytes = new Int16Array(len / 2);
+
+                for (let i = 0; i < len; i += 2) {
+                    bytes[i / 2] = (binaryString.charCodeAt(i) | (binaryString.charCodeAt(i + 1) << 8));
+                }
+
+                // Convert to float32 for WebAudio
+                const floatData = new Float32Array(bytes.length);
+                for (let i = 0; i < bytes.length; i++) {
+                    floatData[i] = bytes[i] / 32768.0;
+                }
+
+                // Create audio buffer and play
+                const buffer = audioContext.createBuffer(1, floatData.length, 24000);
+                buffer.getChannelData(0).set(floatData);
+
+                const source = audioContext.createBufferSource();
+                source.buffer = buffer;
+                source.connect(audioContext.destination);
+                source.start();
+            } catch (e) {
+                console.error('Audio playback error:', e);
+            }
+        }
+
         // Socket events
         socket.on('connect', () => {
             logActivity('Connected to scanner server');
             loadChannels();
             loadRecordings();
+        });
+
+        socket.on('audio_data', (data) => {
+            if (!audioContext) initAudio();
+            playAudioChunk(data.data);
+            // Flash signal LED when receiving audio
+            document.getElementById('ledSignal').classList.add('on');
         });
 
         socket.on('status', updateStatus);
@@ -1005,10 +1061,12 @@
                 });
                 const data = await resp.json();
                 if (data.success) {
+                    // Initialize audio on user interaction (required by browsers)
+                    initAudio();
                     document.getElementById('freqDisplay').textContent = freq.toFixed(5);
                     document.getElementById('channelName').textContent = 'Manual Tune';
                     document.getElementById('channelMode').textContent = 'Direct Frequency';
-                    logActivity(`Tuned to ${freq} MHz`);
+                    logActivity(`Tuned to ${freq} MHz - Audio streaming to browser`);
                     // Auto-start monitoring
                     isMonitoring = true;
                     document.getElementById('btnMonitor').classList.add('active');
