@@ -792,10 +792,6 @@
                 <span class="led-label">Recording</span>
             </div>
             <div class="status-led">
-                <div class="led" id="ledStream"></div>
-                <span class="led-label">Stream</span>
-            </div>
-            <div class="status-led">
                 <div class="led" id="ledSignal"></div>
                 <span class="led-label">Signal</span>
             </div>
@@ -828,7 +824,6 @@
                     <button class="ctrl-btn" id="btnMonitor" onclick="toggleMonitor()">Monitor</button>
                     <button class="ctrl-btn record" id="btnRecord" onclick="toggleRecord()">Record</button>
                     <button class="ctrl-btn" id="btnScan" onclick="toggleScan()">Scan</button>
-                    <button class="ctrl-btn" id="btnStream" onclick="toggleStream()">Stream</button>
                 </div>
             </div>
 
@@ -886,7 +881,6 @@
         let isMonitoring = false;
         let isRecording = false;
         let isScanning = false;
-        let isStreaming = false;
         let currentFilter = 'all';
         let currentTab = 'activity';
         let activityLog = [];
@@ -1106,12 +1100,6 @@
             document.getElementById('btnScan').classList.toggle('active', isScanning);
         }
 
-        function toggleStream() {
-            isStreaming = !isStreaming;
-            document.getElementById('btnStream').classList.toggle('active', isStreaming);
-            document.getElementById('ledStream').classList.toggle('streaming', isStreaming);
-            logActivity(isStreaming ? 'Streaming enabled' : 'Streaming disabled');
-        }
 
         // Sliders
         function setSquelch(val) {
