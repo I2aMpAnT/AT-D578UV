@@ -37,7 +37,7 @@ STEP 4: Import Zones (Optional)
 STEP 5: Set Radio ID
 --------------------
 1. Go to: Optional Setting > Radio ID List
-2. Add your DMR ID (e.g., "I2" as shown in channels)
+2. Add DMR ID: "I2Base" (base station identifier)
 
 STEP 6: Write to Radio
 ----------------------
