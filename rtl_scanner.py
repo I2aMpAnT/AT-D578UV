@@ -262,8 +262,9 @@ class RTLSDRScanner:
         import base64
         while self.rtl_process and self.is_scanning:
             try:
-                # Read chunks of audio data
-                data = self.rtl_process.stdout.read(4096)
+                # Read larger chunks for smoother playback
+                # 24000 Hz * 2 bytes * 0.2 sec = 9600 bytes (~200ms of audio)
+                data = self.rtl_process.stdout.read(9600)
                 if data and callback:
                     # Send as base64 for WebSocket
                     callback(base64.b64encode(data).decode('ascii'))

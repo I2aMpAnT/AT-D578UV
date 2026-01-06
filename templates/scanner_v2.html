@@ -867,10 +867,10 @@
             meterContainer.appendChild(bar);
         }
 
-        // WebAudio setup for browser audio playback
+        // WebAudio setup for browser audio playback with buffering
         let audioContext = null;
-        let audioQueue = [];
-        let isPlaying = false;
+        let nextPlayTime = 0;
+        let isAudioStarted = false;
 
         function initAudio() {
             if (!audioContext) {
@@ -882,10 +882,12 @@
             if (audioContext.state === 'suspended') {
                 audioContext.resume();
             }
+            nextPlayTime = audioContext.currentTime;
+            isAudioStarted = true;
         }
 
         function playAudioChunk(base64Data) {
-            if (!audioContext) return;
+            if (!audioContext || !isAudioStarted) return;
 
             try {
                 // Decode base64 to binary
@@ -903,14 +905,22 @@
                     floatData[i] = bytes[i] / 32768.0;
                 }
 
-                // Create audio buffer and play
+                // Create audio buffer
                 const buffer = audioContext.createBuffer(1, floatData.length, 24000);
                 buffer.getChannelData(0).set(floatData);
 
+                // Schedule playback with proper timing
                 const source = audioContext.createBufferSource();
                 source.buffer = buffer;
                 source.connect(audioContext.destination);
-                source.start();
+
+                // If we've fallen behind, catch up
+                if (nextPlayTime < audioContext.currentTime) {
+                    nextPlayTime = audioContext.currentTime;
+                }
+
+                source.start(nextPlayTime);
+                nextPlayTime += buffer.duration;
             } catch (e) {
                 console.error('Audio playback error:', e);
             }
