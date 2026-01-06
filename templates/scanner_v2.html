@@ -695,27 +695,6 @@
             color: var(--text-secondary);
         }
 
-        /* Quick Tune */
-        #quickFreq {
-            flex: 1;
-            padding: 12px 15px;
-            background: rgba(10, 14, 23, 0.8);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 1rem;
-            border-radius: 5px;
-        }
-
-        #quickFreq:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 15px rgba(0, 217, 255, 0.2);
-        }
-
-        #quickFreq::placeholder {
-            color: var(--text-muted);
-        }
 
         /* Scrollbar */
         ::-webkit-scrollbar {
@@ -845,13 +824,6 @@
                 </div>
             </div>
 
-            <div class="control-group">
-                <div class="control-group-title">Quick Tune</div>
-                <div style="display: flex; gap: 12px;">
-                    <input type="text" id="quickFreq" placeholder="146.520">
-                    <button class="ctrl-btn" onclick="quickTune()" style="padding: 12px 24px;">Tune</button>
-                </div>
-            </div>
         </div>
 
         <!-- Activity & Recordings -->
@@ -1035,14 +1007,6 @@
                 if (ch) updateDisplay(ch);
                 renderChannels();
                 logActivity(`Tuned to: ${ch?.name || num}`);
-            }
-        }
-
-        // Quick tune
-        function quickTune() {
-            const freq = parseFloat(document.getElementById('quickFreq').value);
-            if (freq) {
-                tuneFrequency(freq);
             }
         }
 
