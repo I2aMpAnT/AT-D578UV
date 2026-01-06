@@ -271,32 +271,26 @@ class RTLSDRScanner:
                 print(f"Audio stream error: {e}")
                 break
 
-    def start_monitoring(self, channel_num: int, output_callback: Optional[Callable] = None):
+    def start_monitoring(self, channel_num: int, audio_callback: Optional[Callable] = None):
         """Start monitoring a channel using rtl_fm"""
         if not self.tune_channel(channel_num):
             return False
 
+        self.audio_callback = audio_callback
         channel = self.current_channel
         freq_hz = int(channel.rx_freq * 1_000_000)
 
-        # Determine modulation based on channel type
-        if channel.channel_type == ChannelType.ANALOG:
-            # FM modulation for analog
-            modulation = 'fm'
-            sample_rate = 24000
-        else:
-            # For DMR, we need raw IQ and external decoder
-            modulation = 'raw'
-            sample_rate = 48000
+        # Stop any existing monitoring
+        self.stop_monitoring()
 
-        # Build rtl_fm command
+        # Build rtl_fm command - FM for analog
         cmd = [
             'rtl_fm',
             '-f', str(freq_hz),
-            '-M', modulation,
-            '-s', str(sample_rate),
-            '-g', '40',  # Gain
-            '-l', '10',  # Squelch level
+            '-M', 'fm',
+            '-s', '24000',
+            '-g', '40',
+            '-l', '10',
             '-'
         ]
 
@@ -307,13 +301,15 @@ class RTLSDRScanner:
                 stderr=subprocess.DEVNULL
             )
             self.is_scanning = True
+            print(f"Started monitoring channel {channel_num}: {channel.name} ({channel.rx_freq} MHz)")
 
-            # Start audio processing thread
-            threading.Thread(
-                target=self._audio_processor,
-                args=(output_callback,),
-                daemon=True
-            ).start()
+            # Start audio streaming thread
+            if audio_callback:
+                threading.Thread(
+                    target=self._stream_audio,
+                    args=(audio_callback,),
+                    daemon=True
+                ).start()
 
             return True
         except Exception as e:

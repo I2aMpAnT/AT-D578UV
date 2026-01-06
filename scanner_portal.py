@@ -220,11 +220,11 @@ def tune_frequency():
 
 @app.route('/api/monitor/start/<int:channel_num>', methods=['POST'])
 def start_monitoring(channel_num):
-    """Start monitoring a channel"""
+    """Start monitoring a channel with browser audio streaming"""
     if not scanner:
         return jsonify({'error': 'Scanner not initialized'}), 500
 
-    success = scanner.start_monitoring(channel_num)
+    success = scanner.start_monitoring(channel_num, audio_callback=audio_stream_callback)
     if success:
         state['scanning'] = True
         return jsonify({'success': True, 'message': f'Monitoring channel {channel_num}'})
