@@ -113,6 +113,26 @@
             letter-spacing: 4px;
         }
 
+        .freq-input {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            text-align: center;
+            width: 400px;
+            padding: 10px;
+            text-shadow: 0 0 40px rgba(0, 217, 255, 0.6);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
+        }
+
+        .freq-input:focus {
+            outline: none;
+            box-shadow: 0 0 50px rgba(0, 217, 255, 0.5);
+        }
+
         .frequency-unit {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
@@ -744,8 +764,9 @@
             <div class="license-badge">GMRS: WSKW654</div>
         </div>
 
-        <div class="frequency-display">
+        <div class="frequency-display" onclick="showFreqInput()" style="cursor: pointer;" title="Click to enter frequency">
             <span class="frequency-value" id="freqDisplay">----.-----</span>
+            <input type="text" id="freqInput" class="freq-input" style="display:none;" placeholder="462.5875" onkeypress="handleFreqInput(event)" onblur="hideFreqInput()">
             <span class="frequency-unit">MHz</span>
         </div>
 
@@ -971,13 +992,55 @@
         function quickTune() {
             const freq = parseFloat(document.getElementById('quickFreq').value);
             if (freq) {
-                // Find closest channel or tune directly
-                const ch = channels.find(c => Math.abs(c.frequency - freq) < 0.001);
-                if (ch) {
-                    tuneChannel(ch.number);
-                } else {
-                    logActivity(`Direct tune: ${freq} MHz`);
+                tuneFrequency(freq);
+            }
+        }
+
+        // Tune to a specific frequency
+        async function tuneFrequency(freq) {
+            // Find closest channel or tune directly
+            const ch = channels.find(c => Math.abs(c.frequency - freq) < 0.001);
+            if (ch) {
+                tuneChannel(ch.number);
+            } else {
+                // Direct frequency tune - update display
+                document.getElementById('freqDisplay').textContent = freq.toFixed(5);
+                document.getElementById('channelName').textContent = 'Manual Tune';
+                document.getElementById('channelMode').textContent = 'Direct Frequency';
+                logActivity(`Direct tune: ${freq} MHz`);
+            }
+        }
+
+        // Show frequency input
+        function showFreqInput(event) {
+            if (event) event.stopPropagation();
+            const display = document.getElementById('freqDisplay');
+            const input = document.getElementById('freqInput');
+            display.style.display = 'none';
+            input.style.display = 'inline-block';
+            input.value = display.textContent !== '----.-----' ? display.textContent : '';
+            input.focus();
+            input.select();
+        }
+
+        // Hide frequency input
+        function hideFreqInput() {
+            const display = document.getElementById('freqDisplay');
+            const input = document.getElementById('freqInput');
+            display.style.display = 'inline';
+            input.style.display = 'none';
+        }
+
+        // Handle frequency input keypress
+        function handleFreqInput(event) {
+            if (event.key === 'Enter') {
+                const freq = parseFloat(document.getElementById('freqInput').value);
+                if (freq && freq > 1 && freq < 1000) {
+                    tuneFrequency(freq);
                 }
+                hideFreqInput();
+            } else if (event.key === 'Escape') {
+                hideFreqInput();
             }
         }
 
