@@ -1,0 +1,95 @@
+D578UV CPS MANUAL CONFIGURATION
+================================
+These settings must be configured manually in CPS (not CSV importable)
+
+=====================================
+1. RADIO ID LIST
+=====================================
+Optional Setting > Radio ID List
+- ID 1: I2
+- ID 2: MrSI2
+
+=====================================
+2. ENCRYPTION KEYS (AES-256)
+=====================================
+Optional Setting > Encrypt > Digital Encryption List
+
+KEY1: 285DAE5A749DE26BDE6B843892A5C58EE935FFE0660C6A19327F05D28B064920
+KEY2: 2CF0F5D56777697DADD6C9F0EA980E1D100D9709AE172AF3C76CC9EE8E444234
+KEY3: 0DFAC8681EECFC4FFCE88DBAB6EE48EDF9445DDEE24F7B3FA734D4841BF7BEA0
+
+Then assign to channels:
+- ENCRYPTED 1 > Digital Encryption = KEY1
+- ENCRYPTED 2 > Digital Encryption = KEY2
+- ENCRYPTED 3 > Digital Encryption = KEY3
+
+=====================================
+3. P-KEY ASSIGNMENTS
+=====================================
+Optional Setting > Key Function
+
+SHORT PRESS:
+- P1 Short: Zone Up
+- P2 Short: Scan On/Off
+- P3 Short: Repeater/Simplex
+- P4 Short: Record
+- P5 Short: A/B
+- P6 Short: Encryption On/Off
+
+LONG PRESS:
+- P1 Long: Zone Down
+- P2 Long: Scan List
+- P3 Long: Repeater Mode
+- P4 Long: Record List
+- P5 Long: Main Channel
+- P6 Long: Voltage
+
+=====================================
+4. REPEATER MODE SETTINGS
+=====================================
+Optional Setting > Other > Rep-Mode Setting
+
+For Single Frequency DMR Repeater (timeslot interleave):
+- Rep-Mode: On
+- DMR Mode: Double Slot (DCDM TS Split)
+- Cross Band: Off (for same-band repeat)
+- Slot: Time Slot 1 (base RX)
+
+On HTs connecting to this repeater:
+- Talkaround: OFF (critical!)
+- DMR Mode: DCDM TS Split
+- Or: One HT on TS1, other on TS2
+
+=====================================
+5. SCAN SETTINGS
+=====================================
+Optional Setting > Scan
+
+- Scan Mode: Time Operated (TO)
+- Priority Channel: On
+- Dwell Time: 0.3s (fast)
+- Dropout Delay: 0.3s (fast)
+- Look Back Time A: 1.5s
+- Look Back Time B: 1.5s
+
+=====================================
+6. POWER SETTINGS (BASE STATION)
+=====================================
+All channels already set to HIGH power.
+
+Optional Setting > Power On
+- Set startup zone to ENCRYPTED
+- Set startup channel to ENCRYPTED 1
+
+=====================================
+IMPORT ORDER IN CPS:
+=====================================
+1. Tool > Import > Channel > channels.csv
+2. Tool > Import > Zone > zones.csv
+3. Tool > Import > Scan List > scanlist.csv
+4. Manual: Add Radio IDs (section 1)
+5. Manual: Add Encryption Keys (section 2)
+6. Manual: Assign keys to channels 1-3
+7. Manual: P-Key assignments (section 3)
+8. Manual: Repeater settings (section 4)
+9. Program > Write to Radio
