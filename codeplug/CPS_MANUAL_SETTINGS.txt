@@ -31,7 +31,7 @@ Optional Setting > Key Function
 SHORT PRESS:
 - P1 Short: Scan On/Off
 - P2 Short: A/B
-- P3 Short: Repeater/Simplex
+- P3 Short: Repeater
 - P4 Short: Record
 - P5 Short: Sub PTT
 - P6 Short: Encryption On/Off
@@ -39,7 +39,7 @@ SHORT PRESS:
 LONG PRESS:
 - P1 Long: Scan List
 - P2 Long: Main Channel
-- P3 Long: Repeater Mode
+- P3 Long: Talk Around
 - P4 Long: Record List
 - P5 Long: Squelch Off
 - P6 Long: Voltage
