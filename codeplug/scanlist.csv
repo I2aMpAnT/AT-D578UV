@@ -1,2 +1,2 @@
 No.,Scan List Name,Scan Channel Member,Scan Channel Member RX Frequency,Scan Mode,Priority Channel Select,Priority Channel 1,Priority Channel 1 RX Frequency,Priority Channel 2,Priority Channel 2 RX Frequency,Revert Channel,Look Back Time A[s],Look Back Time B[s],Dropout Delay Time[s],Dwell Time[s],Designated TX Channel
-1,Main Scan,ENCRYPTED 1|ENCRYPTED 2|ENCRYPTED 3|FRS 22,451.01250|456.08750|462.11250|462.72500,TO,Priority Channel,ENCRYPTED 1,451.01250,ENCRYPTED 2,456.08750,Selected,1.5,1.5,0.3,0.3,Last Active Channel
+1,Main Scan,ENCRYPTED 1|ENCRYPTED 2|ENCRYPTED 3|FRS 22,451.01250|456.08750|462.11250|462.72500,TO,Priority Channel,ENCRYPTED 1,451.01250,ENCRYPTED 2,456.08750,Selected,1.5,1.5,5.0,0.3,Last Active Channel
