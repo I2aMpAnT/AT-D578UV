@@ -6,7 +6,7 @@ These settings must be configured manually in CPS (not CSV importable)
 1. RADIO ID LIST
 =====================================
 Optional Setting > Radio ID List
-- ID 1: I2
+- ID 1: I2Base
 - ID 2: MrSI2
 
 =====================================
