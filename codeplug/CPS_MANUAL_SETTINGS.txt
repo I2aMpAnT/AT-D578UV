@@ -29,7 +29,7 @@ Then assign to channels:
 Optional Setting > Key Function
 
 SHORT PRESS:
-- P1 Short: Channel Up
+- P1 Short: Weather Channel
 - P2 Short: Scan On/Off
 - P3 Short: Repeater/Simplex
 - P4 Short: Record
@@ -37,7 +37,7 @@ SHORT PRESS:
 - P6 Short: Encryption On/Off
 
 LONG PRESS:
-- P1 Long: Channel Down
+- P1 Long: Squelch Off
 - P2 Long: Scan List
 - P3 Long: Repeater Mode
 - P4 Long: Record List
