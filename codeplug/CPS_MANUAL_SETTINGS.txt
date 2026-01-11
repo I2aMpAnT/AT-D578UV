@@ -90,6 +90,25 @@ On HTs connecting to this repeater:
 - DMR Mode: DCDM TS Split
 - Or: One HT on TS1, other on TS2
 
+DM-32UV HANDHELD CONFIGURATION FOR SFR:
+---------------------------------------
+The DM-32UV supports DCDM (Dual Capacity Direct Mode) for
+dual timeslot simplex operation. On the radio menu:
+
+1. Set channel to same frequency as AT-D578UV base
+2. Set correct timeslot (TS1 or TS2)
+3. Match color code to base station
+4. "Dual Mode" setting (if visible on radio):
+   - This enables DCDM dual timeslot operation
+   - Allows proper SFR communication
+   - When enabled, timeslot settings are enforced
+5. Talkaround/Simplex: MUST be OFF
+
+Note: "Dual Mode" on DM-32UV can mean:
+- Analog/Digital dual mode (FM vs DMR switching)
+- DCDM/Dual Slot mode (timeslot operation)
+Check channel settings for DCDM-related options.
+
 =====================================
 5. SCAN SETTINGS
 =====================================
