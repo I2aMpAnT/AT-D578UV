@@ -1,24 +1,43 @@
 D578UV CPS MANUAL CONFIGURATION
 ================================
-Use I2Base.db3 as the CPS project file. It contains:
-- All 38 channels (HIGH power)
-- All 6 Radio IDs pre-configured
-- MAIN zone with all channels
 
-Only these settings need manual configuration in CPS:
+CSV IMPORT FILES:
+-----------------
+- channels.csv     - 38 channels (HIGH power)
+- zones.csv        - MAIN zone with all channels
+- scanlist.csv     - Main Scan (channels 1,2,3,5)
+- radioid.csv      - 6 Radio IDs
+- talkgroups.csv   - Contacts/Talk Groups
+- encryption.csv   - AES-256 encryption keys
+
+IMPORT INSTRUCTIONS:
+--------------------
+1. Tools > Mode > Check "Channel name is not unique"
+2. Tool > Import
+3. Click "Import From File List" and select I2Base.lst
+   (OR import each CSV individually using buttons on left)
+
+IMPORT ORDER (if importing individually):
+1. Radio ID List (radioid.csv)
+2. Talk Groups (talkgroups.csv)
+3. Channels (channels.csv)
+4. Zones (zones.csv)
+5. Scan List (scanlist.csv)
+
+After import, these settings need manual configuration:
 
 =====================================
-1. RADIO ID LIST (ALREADY CONFIGURED)
+1. RADIO ID LIST (in radioid.csv)
 =====================================
-I2Base.db3 already has all 6 Radio IDs configured:
-- ID 1: I2Base (DMR ID 100) - AT-D578UV base station
-- ID 2: I2 (DMR ID 101) - DRN HT
-- ID 3: MrSI2 (DMR ID 102) - DJN HT
-- ID 4: LiLI21 (DMR ID 1) - EJD HT
-- ID 5: LiLI22 (DMR ID 2) - JGN HT
-- ID 6: LiLI23 (DMR ID 3) - MAN HT
+6 Radio IDs configured:
+- I2Base (DMR ID 100) - AT-D578UV base station
+- I2 (DMR ID 101) - DRN HT
+- MrSI2 (DMR ID 102) - DJN HT
+- LiLI21 (DMR ID 1) - EJD HT
+- LiLI22 (DMR ID 2) - JGN HT
+- LiLI23 (DMR ID 3) - MAN HT
 
-Verify at: Optional Setting > Radio ID List
+After import, verify at: Optional Setting > Radio ID List
 
 =====================================
 2. ENCRYPTION KEYS (AES-256)
@@ -93,15 +112,15 @@ Optional Setting > Power On
 - Set startup channel to ENCRYPTED 1
 
 =====================================
-HOW TO USE I2Base.db3:
+COMPLETE SETUP PROCEDURE:
 =====================================
-1. File > Open > I2Base.db3
-2. Manual: Add Encryption Keys (section 2)
-3. Manual: Assign keys to channels ENCRYPTED 1-3
-4. Manual: P-Key assignments (section 3)
-5. Manual: Repeater settings (section 4)
-6. Manual: Scan settings (section 5)
-7. Program > Write to Radio
+1. Tools > Mode > Check "Channel name is not unique"
+2. Tool > Import > Import each CSV (or use I2Base.lst)
+3. Manual: Add Encryption Keys (section 2)
+4. Manual: Assign keys to channels ENCRYPTED 1-3
+5. Manual: P-Key assignments (section 3)
+6. Manual: Repeater settings (section 4)
+7. Manual: Scan settings (section 5)
+8. Program > Write to Radio
 
-Note: Channels, Radio IDs, and zones are already configured.
-The CodeplugSample.rdt is a minimal sample for reference only.
+Note: The CodeplugSample.rdt is a minimal sample for reference only.

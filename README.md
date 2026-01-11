@@ -15,21 +15,29 @@ This project provides two main components:
 
 ### AT-D578UV (Base Station / Repeater)
 
-The AT-D578UV codeplug is in `codeplug/` folder. Open `I2Base.db3` directly in AnyTone CPS.
+The AT-D578UV codeplug is in `codeplug/` folder. Import CSV files into AnyTone CPS.
 
-**Files:**
+**CSV Import Files:**
 | File | Description |
 |------|-------------|
-| `I2Base.db3` | Complete CPS project file (38 channels, 6 Radio IDs) |
+| `channels.csv` | 38 channels (HIGH power) |
+| `zones.csv` | MAIN zone with all channels |
+| `scanlist.csv` | Main Scan (channels 1,2,3,5) |
+| `radioid.csv` | 6 Radio IDs |
+| `talkgroups.csv` | Contacts/Talk Groups |
+| `encryption.csv` | AES-256 encryption keys (reference) |
+| `I2Base.lst` | File list for batch import |
 | `CPS_MANUAL_SETTINGS.txt` | Manual configuration guide |
 | `CodeplugSample.rdt` | Minimal sample (reference only) |
 
 **Quick Start:**
-1. File > Open > `I2Base.db3`
-2. Add encryption keys manually (see `CPS_MANUAL_SETTINGS.txt`)
-3. Assign keys to ENCRYPTED 1-3 channels
-4. Configure P-key assignments
-5. Program > Write to Radio
+1. Tools > Mode > Check "Channel name is not unique"
+2. Tool > Import > Import From File List > `I2Base.lst`
+   (Or import each CSV individually)
+3. Add encryption keys manually (see `CPS_MANUAL_SETTINGS.txt`)
+4. Assign keys to ENCRYPTED 1-3 channels
+5. Configure P-key assignments
+6. Program > Write to Radio
 
 ### DM-32UV Handhelds
 
@@ -248,7 +256,13 @@ AT-D578UV/
 ├── scanner_config.json        # Scanner configuration
 ├── setup_scanner.sh           # Raspberry Pi setup script
 ├── codeplug/                  # AT-D578UV codeplug (base station)
-│   ├── I2Base.db3             # Main CPS project (38 ch, 6 Radio IDs)
+│   ├── channels.csv           # 38 channels (HIGH power)
+│   ├── zones.csv              # MAIN zone with all channels
+│   ├── scanlist.csv           # Main Scan (channels 1,2,3,5)
+│   ├── radioid.csv            # 6 Radio IDs
+│   ├── talkgroups.csv         # Contacts/Talk Groups
+│   ├── encryption.csv         # AES-256 keys (reference)
+│   ├── I2Base.lst             # File list for batch import
 │   ├── CPS_MANUAL_SETTINGS.txt # Manual CPS settings
 │   ├── CodeplugSample.rdt     # Minimal sample (reference)
 │   └── README.txt             # Codeplug instructions
