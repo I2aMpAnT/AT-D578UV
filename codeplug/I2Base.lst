@@ -1,0 +1,8 @@
+[Channel]
+channels.csv
+[Zone]
+zones.csv
+[Scan List]
+scanlist.csv
+[Radio ID List]
+radioid.csv
