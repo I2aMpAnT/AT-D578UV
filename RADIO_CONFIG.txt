@@ -2,26 +2,21 @@ RADIO CONFIGURATION REFERENCE
 ==============================
 DO NOT DELETE - This file contains the correct radio configurations
 
-=== DMR IDs ===
-I2Base  = 100  (D578UV base station - DRN)
-I2      = 101
-MrSI2   = 102  (DM32UV handheld - DJN)
-LiLI21  = 1    (DM32UV handheld - EJD)
-LiLI22  = 2    (DM32UV handheld - JGN)
-LiLI23  = 3    (DM32UV handheld - MAN)
+=== DMR IDs (from CPS screenshot) ===
+No. | ID  | Name   | Radio
+----|-----|--------|------
+1   | 101 | I2     | DRN (D578UV base)
+2   | 102 | MrSI2  | DJN (DM32UV)
+3   | 1   | LiLI21 | EJD (DM32UV)
+4   | 2   | LiLI22 | JGN (DM32UV)
+5   | 3   | LiLI23 | MAN (DM32UV)
+6   | 100 | I2Base | (spare)
 
 === Channel Settings ===
 ENCRYPTED 1: CC=2,  KEY1, DCDM TS Split
 ENCRYPTED 2: CC=4,  KEY2, DCDM TS Split
 ENCRYPTED 3: CC=6,  KEY3, DCDM TS Split
 FRS 22:      CC=10, No encryption, DCDM TS Split
-
-=== Radio Assignments ===
-DRN = D578UV base station, uses I2Base (ID 100)
-DJN = DM32UV handheld, uses MrSI2 (ID 102)
-EJD = DM32UV handheld, uses LiLI21 (ID 1)
-JGN = DM32UV handheld, uses LiLI22 (ID 2)
-MAN = DM32UV handheld, uses LiLI23 (ID 3)
 
 === Notes ===
 - CPS has a bug with encryption - must use CSV import with KEY1/KEY2/KEY3 specified
