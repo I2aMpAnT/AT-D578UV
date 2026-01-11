@@ -1,39 +1,39 @@
 No.,Channel Name,Channel Type,RX Frequency[MHz],TX Frequency[MHz],Power,Band Width,Scan List,TX Admit,Emergency System,Squelch Level,APRS Report Type,Forbid TX,APRS Receive,Forbid Talkaround,Auto Scan,Lone Work,Emergency Indicator,Emergency ACK,Analog APRS PTT Mode,Digital APRS PTT Mode,TX Contact,RX Group List,Color Code,Time Slot,Encryption,Encryption ID,APRS Report Channel,Direct Dual Mode,Private Confirm,Short Data Confirm,DMR ID,CTC/DCS Decode,CTC/DCS Encode,Scramble,RX Squelch Mode,Signaling Type,PTT ID,VOX Function,PTT ID Display
-1,ENCRYPTED 1,Digital,451.01250,451.01250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,2,Slot 1,1,KEY1,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-2,ENCRYPTED 2,Digital,456.08750,456.08750,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,4,Slot 1,1,KEY2,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-3,ENCRYPTED 3,Digital,462.11250,462.11250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,6,Slot 1,1,KEY3,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-4,FRS 2,Analog,462.58750,462.58750,High,12.5KHz,Scan List 1,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-5,FRS 22,Digital,462.72500,462.72500,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,10,Slot 1,0,None,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-6,MARINE 16,Analog,156.80000,156.80000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-7,MARINE 9,Analog,156.45000,156.45000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-8,USCG 22A,Analog,157.10000,157.10000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-9,MARINE 68,Analog,156.42500,156.42500,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-10,MARINE 69,Analog,156.47500,156.47500,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-11,MARINE 71,Analog,156.57500,156.57500,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-12,MARINE 72,Analog,156.62500,156.62500,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-13,HYA TWR,Analog,119.50000,119.50000,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-14,HYA GND,Analog,118.45000,118.45000,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-15,HYA ATIS,Analog,123.80000,123.80000,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-16,GUARD,Analog,121.50000,121.50000,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-17,UNICOM,Analog,122.95000,122.95000,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-18,BCSO,Analog,155.56500,155.56500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-19,BREWSTR FD,Analog,453.55000,453.55000,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-20,CHAT FD,Analog,453.37500,453.37500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-21,COMM FD,Analog,453.73750,453.73750,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-22,COTUIT FD,Analog,453.38750,453.38750,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-23,DENNIS FD,Analog,453.32500,453.32500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-24,EASTHAM FD,Analog,453.80000,453.80000,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-25,HARWICH FD,Analog,460.55000,460.55000,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-26,HYANNIS FD,Analog,460.62500,460.62500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-27,ORLEANS FD,Analog,453.12500,453.12500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-28,PTOWN FD,Analog,453.27500,453.27500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-29,SAND FD,Analog,460.42500,460.42500,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-30,WELLFL FD,Analog,453.18750,453.18750,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-31,YARM FD,Analog,453.15000,453.15000,High,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-32,NOAA WX,Analog,162.47500,162.47500,High,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-33,2M CALL,Analog,146.52000,146.52000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-34,2M SIMP1,Analog,146.55000,146.55000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-35,2M SIMP2,Analog,147.42000,147.42000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-36,70CM CALL,Analog,446.00000,446.00000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-37,70CM SIM1,Analog,446.50000,446.50000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
-38,70CM SIM2,Analog,447.00000,447.00000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+1,ENCRYPTED 1,Digital,451.01250,451.01250,Low,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,2,Slot 1,1,KEY1,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+2,ENCRYPTED 2,Digital,456.08750,456.08750,Low,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,4,Slot 1,1,KEY2,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+3,ENCRYPTED 3,Digital,462.11250,462.11250,Low,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,6,Slot 1,1,KEY3,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+4,FRS 2,Analog,462.58750,462.58750,Low,12.5KHz,Scan List 1,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+5,FRS 22,Digital,462.72500,462.72500,Low,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,10,Slot 1,0,None,1,1,1,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+6,MARINE 16,Analog,156.80000,156.80000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+7,MARINE 9,Analog,156.45000,156.45000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+8,USCG 22A,Analog,157.10000,157.10000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+9,MARINE 68,Analog,156.42500,156.42500,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+10,MARINE 69,Analog,156.47500,156.47500,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+11,MARINE 71,Analog,156.57500,156.57500,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+12,MARINE 72,Analog,156.62500,156.62500,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+13,HYA TWR,Analog,119.50000,119.50000,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+14,HYA GND,Analog,118.45000,118.45000,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+15,HYA ATIS,Analog,123.80000,123.80000,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+16,GUARD,Analog,121.50000,121.50000,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+17,UNICOM,Analog,122.95000,122.95000,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+18,BCSO,Analog,155.56500,155.56500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+19,BREWSTR FD,Analog,453.55000,453.55000,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+20,CHAT FD,Analog,453.37500,453.37500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+21,COMM FD,Analog,453.73750,453.73750,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+22,COTUIT FD,Analog,453.38750,453.38750,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+23,DENNIS FD,Analog,453.32500,453.32500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+24,EASTHAM FD,Analog,453.80000,453.80000,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+25,HARWICH FD,Analog,460.55000,460.55000,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+26,HYANNIS FD,Analog,460.62500,460.62500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+27,ORLEANS FD,Analog,453.12500,453.12500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+28,PTOWN FD,Analog,453.27500,453.27500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+29,SAND FD,Analog,460.42500,460.42500,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+30,WELLFL FD,Analog,453.18750,453.18750,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+31,YARM FD,Analog,453.15000,453.15000,Low,12.5KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+32,NOAA WX,Analog,162.47500,162.47500,Low,25KHz,None,Always,None,3,Off,1,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+33,2M CALL,Analog,146.52000,146.52000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+34,2M SIMP1,Analog,146.55000,146.55000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+35,2M SIMP2,Analog,147.42000,147.42000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+36,70CM CALL,Analog,446.00000,446.00000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+37,70CM SIM1,Analog,446.50000,446.50000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
+38,70CM SIM2,Analog,447.00000,447.00000,Low,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI22,None,None,None,Carrier/CTC,None,OFF,0,0
