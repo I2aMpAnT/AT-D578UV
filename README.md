@@ -9,6 +9,94 @@ This project provides two main components:
 1. **Software Microphone** - Desktop GUI that emulates the physical hand microphone via serial/DigiRig
 2. **RTL-SDR Scanner Portal** - Web-based multi-channel monitoring, recording, and transcription system
 
+---
+
+## DMR Repeater System Configuration
+
+### Firmware Bug Workaround
+
+The DM-32UV handheld firmware has a bug that **blocks channels with matching RX frequencies**. To work around this, we use a split channel approach:
+
+- **Main channels (RX)** - For receiving on TimeSlot 2
+- **TX-only channels** - For transmitting on TimeSlot 1 (NO RX frequency to avoid the bug)
+
+### Channel Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    MOBILE RADIO (AT-D578UV)                     │
+├─────────────────────────────────────────────────────────────────┤
+│  Channel A (TX Mode)     │  Channel B (RX Mode)                 │
+│  ────────────────────    │  ────────────────────                │
+│  TX-only channel         │  Main channel                        │
+│  TimeSlot 1              │  TimeSlot 2                          │
+│  No RX freq (bug fix)    │  RX/TX freq (same)                   │
+│  → Keys into repeater    │  ← Receives from repeater            │
+│                          │  ← Also receives direct HT TX        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         REPEATER                                 │
+├─────────────────────────────────────────────────────────────────┤
+│  RX: TimeSlot 1 (from HTs and mobile)                           │
+│  TX: TimeSlot 2 (to all radios)                                 │
+│  RX Scan: All 4 frequencies on TS1                              │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    WEB PORTAL (RTL-SDR)                          │
+├─────────────────────────────────────────────────────────────────┤
+│  RX Scan: All 4 frequencies on TimeSlot 2                       │
+│  Catches: Repeater TX + Direct HT TX (if on TS2)                │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Radio Operation
+
+1. **Set Channel B** to the main channel (e.g., "ENCRYPTED 1") - this is your RX channel on TS2
+2. **Set Channel A** to the corresponding TX channel (e.g., "ENC 1 TX") - this is your TX channel on TS1
+3. PTT transmits on Channel A (TS1) → Repeater receives and retransmits on TS2
+4. Channel B receives the repeater's transmission on TS2
+
+### Repeater Configuration
+
+The repeater must be configured to:
+- **RX Scan**: All 4 frequencies on TimeSlot 1
+- **TX**: Same frequency, TimeSlot 2
+- This creates a TS1→TS2 crossband-style operation on the same frequency
+
+---
+
+## Encrypted DMR Channels
+
+### Channel Pairs
+
+| Main Channel (RX/TS2) | TX Channel (TX/TS1) | Frequency | Color Code | Encryption |
+|-----------------------|---------------------|-----------|------------|------------|
+| ENCRYPTED 1           | ENC 1 TX            | 451.01250 | 2          | KEY1       |
+| ENCRYPTED 2           | ENC 2 TX            | 456.08750 | 4          | KEY2       |
+| ENCRYPTED 3           | ENC 3 TX            | 462.11250 | 6          | KEY3       |
+| FRS 22                | FRS 22 TX           | 462.72500 | 10         | None       |
+
+### Encryption Keys (AES-256)
+
+| Key Name | Key (Hex)                                                        |
+|----------|------------------------------------------------------------------|
+| KEY1     | `285DAE5A749DE26BDE6B843892A5C58EE935FFE0660C6A19327F05D28B064920` |
+| KEY2     | `2CF0F5D56777697DADD6C9F0EA980E1D100D9709AE172AF3C76CC9EE8E444234` |
+| KEY3     | `0DFAC8681EECFC4FFCE88DBAB6EE48EDF9445DDEE24F7B3FA734D4841BF7BEA0` |
+
+### TimeSlot Summary
+
+| Channel Type | TimeSlot | Purpose |
+|--------------|----------|---------|
+| Main (RX)    | TS2      | Receive from repeater or direct HT |
+| TX-only      | TS1      | Transmit to repeater input |
+
+---
+
 ## Features
 
 ### Software Microphone (Desktop)
@@ -27,6 +115,8 @@ This project provides two main components:
 - Channel scanning with configurable dwell time
 - NAS storage integration for recordings
 
+---
+
 ## Hardware Requirements
 
 ### For Software Microphone
@@ -39,6 +129,8 @@ This project provides two main components:
 - Raspberry Pi 4 (recommended) or similar SBC
 - Antenna suitable for your frequencies
 - Optional: NAS for recording storage
+
+---
 
 ## Quick Start
 
@@ -74,6 +166,8 @@ python scanner_portal.py
 http://<raspberry-pi-ip>:5001
 ```
 
+---
+
 ## Configuration
 
 ### Channel Configuration
@@ -84,8 +178,9 @@ Configure encryption keys in `scanner_config.json`:
 ```json
 {
   "encryption_keys": {
-    "KEY1": "YOUR_128BIT_HEX_KEY",
-    "KEY2": "YOUR_128BIT_HEX_KEY"
+    "KEY1": "285DAE5A749DE26BDE6B843892A5C58EE935FFE0660C6A19327F05D28B064920",
+    "KEY2": "2CF0F5D56777697DADD6C9F0EA980E1D100D9709AE172AF3C76CC9EE8E444234",
+    "KEY3": "0DFAC8681EECFC4FFCE88DBAB6EE48EDF9445DDEE24F7B3FA734D4841BF7BEA0"
   }
 }
 ```
@@ -101,6 +196,8 @@ Modify paths in `scanner_config.json` for your NAS setup:
   }
 }
 ```
+
+---
 
 ## Web Portal Endpoints
 
@@ -145,6 +242,8 @@ Modify paths in `scanner_config.json` for your NAS setup:
 | 5001 | Web Portal |
 | 8080 | VLC Audio Stream (`http://host:8080/stream.ogg`) |
 
+---
+
 ## File Structure
 
 ```
@@ -157,7 +256,14 @@ AT-D578UV/
 ├── audio_streamer.py      # Modular audio streaming (VLC, sox, recording)
 ├── scanner_config.json    # Scanner configuration
 ├── setup_scanner.sh       # Raspberry Pi setup script
-├── DRN_channels.csv       # Channel configuration
+├── codeplug/
+│   ├── channels.csv       # Channel configuration with TX-only channels
+│   ├── encryption_keys.csv # AES-256 encryption keys
+│   ├── zones.csv          # Zone definitions
+│   ├── scanlist.csv       # Scan list configuration
+│   ├── contacts.csv       # DMR contacts
+│   └── radioid.csv        # Radio ID configuration
+├── DRN_channels.csv       # Legacy channel configuration
 ├── DRN.data               # Codeplug binary (encryption keys)
 ├── templates/
 │   ├── index.html         # DigiRig portal interface
@@ -166,6 +272,8 @@ AT-D578UV/
 ├── requirements-webportal.txt
 └── requirements-scanner.txt
 ```
+
+---
 
 ## Running as a Service
 
@@ -185,6 +293,8 @@ View logs:
 journalctl -u rtl-scanner -f
 ```
 
+---
+
 ## Dependencies
 
 ### System (Raspberry Pi)
@@ -203,6 +313,8 @@ pip install openai-whisper
 ```
 Note: Whisper is resource-intensive. Use 'tiny' or 'base' model on Raspberry Pi.
 
+---
+
 ## Keyboard Shortcuts (Scanner Portal)
 
 | Key | Action |
@@ -211,6 +323,8 @@ Note: Whisper is resource-intensive. Use 'tiny' or 'base' model on Raspberry Pi.
 | Space | Toggle monitor |
 | R | Toggle record |
 | S | Toggle scan |
+
+---
 
 ## Troubleshooting
 
@@ -239,7 +353,16 @@ sudo udevadm control --reload-rules
 rtl_fm -f 146.52M -M fm -s 24000 -g 40 - | play -r 24000 -t raw -e signed -b 16 -c 1 -
 ```
 
+---
+
 ## Version History
+
+### v2.2.0 - DMR Repeater Timeslot Split
+- Added TX-only channels for repeater operation
+- Implemented DM-32UV firmware bug workaround (no matching RX frequencies)
+- Main channels set to TimeSlot 2 for RX
+- TX channels set to TimeSlot 1 for repeater input
+- Changed DMR MODE from "DCDM TS Split" to "Simplex" for manual timeslot control
 
 ### v2.1.0 - Enhanced Audio Streaming
 - Added `audio_streamer.py` module based on rtl_fm_python, K0NYC/rtl-fm patterns
@@ -274,6 +397,8 @@ rtl_fm -f 146.52M -M fm -s 24000 -g 40 - | play -r 24000 -t raw -e signed -b 16 
 
 ### v1.0.0
 - Initial release
+
+---
 
 ## Legal Notice
 
