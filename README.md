@@ -11,89 +11,84 @@ This project provides two main components:
 
 ---
 
-## DMR Repeater System Configuration
+## Codeplug Configuration
 
-### Firmware Bug Workaround
+### AT-D578UV (Base Station / Repeater)
 
-The DM-32UV handheld firmware has a bug that **blocks channels with matching RX frequencies**. To work around this, we use a split channel approach:
+The AT-D578UV codeplug is in `codeplug/` folder. Import CSVs into AnyTone CPS software.
 
-- **Main channels (RX)** - For receiving on TimeSlot 2
-- **TX-only channels** - For transmitting on TimeSlot 1 (NO RX frequency to avoid the bug)
+**Files:**
+| File | Description |
+|------|-------------|
+| `channels.csv` | 38 channels (High power) |
+| `zones.csv` | Zone definitions |
+| `scanlist.csv` | Scan list configuration |
+| `contacts.csv` | DMR contacts |
+| `radioid.csv` | Radio IDs (I2Base, MrSI2) |
+| `encryption_keys.csv` | AES-256 keys |
+| `CPS_MANUAL_SETTINGS.txt` | Settings that must be configured manually in CPS |
 
-### Channel Architecture
+**Import Order:**
+1. Tool > Import > Channel > `channels.csv`
+2. Tool > Import > Zone > `zones.csv`
+3. Tool > Import > Scan List > `scanlist.csv`
+4. Manual: Add Radio IDs, Encryption Keys, P-Key assignments (see `CPS_MANUAL_SETTINGS.txt`)
+5. Program > Write to Radio
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    MOBILE RADIO (AT-D578UV)                     │
-├─────────────────────────────────────────────────────────────────┤
-│  Channel A (TX Mode)     │  Channel B (RX Mode)                 │
-│  ────────────────────    │  ────────────────────                │
-│  TX-only channel         │  Main channel                        │
-│  TimeSlot 1              │  TimeSlot 2                          │
-│  No RX freq (bug fix)    │  RX/TX freq (same)                   │
-│  → Keys into repeater    │  ← Receives from repeater            │
-│                          │  ← Also receives direct HT TX        │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                         REPEATER                                 │
-├─────────────────────────────────────────────────────────────────┤
-│  RX: TimeSlot 1 (from HTs and mobile)                           │
-│  TX: TimeSlot 2 (to all radios)                                 │
-│  RX Scan: All 4 frequencies on TS1                              │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    WEB PORTAL (RTL-SDR)                          │
-├─────────────────────────────────────────────────────────────────┤
-│  RX Scan: All 4 frequencies on TimeSlot 2                       │
-│  Catches: Repeater TX + Direct HT TX (if on TS2)                │
-└─────────────────────────────────────────────────────────────────┘
-```
+### DM-32UV Handhelds
 
-### Radio Operation
+The DM-32UV HTs have a **firmware bug** that blocks channels with matching RX frequencies. Workaround uses TX-only channels.
 
-1. **Set Channel B** to the main channel (e.g., "ENCRYPTED 1") - this is your RX channel on TS2
-2. **Set Channel A** to the corresponding TX channel (e.g., "ENCRYPTED 1 TX") - this is your TX channel on TS1
-3. PTT transmits on Channel A (TS1) → Repeater receives and retransmits on TS2
-4. Channel B receives the repeater's transmission on TS2
+**HT Codeplug Files:**
+| File | DMR ID | Power |
+|------|--------|-------|
+| `DRN.csv` | I2 | Low |
+| `DJN.csv` | MrSI2 | Low |
+| `EJD.csv` | LiLI21 | Low |
+| `JGN.csv` | LiLI22 | Low |
+| `MAN.csv` | LiLI23 | Low |
 
-### Repeater Configuration
+**HT Channel Structure (42 channels):**
+- Main channels (RX): TimeSlot 2, normal RX/TX
+- TX-only channels: TimeSlot 1, NO RX frequency (firmware bug workaround)
 
-The repeater must be configured to:
-- **RX Scan**: All 4 frequencies on TimeSlot 1
-- **TX**: Same frequency, TimeSlot 2
-- This creates a TS1→TS2 crossband-style operation on the same frequency
+**HT Operation:**
+1. Set Channel B to main channel (e.g., "ENCRYPTED 1") - RX on TS2
+2. Set Channel A to TX channel (e.g., "ENCRYPTED 1 TX") - TX on TS1
+3. PTT transmits on TS1 → Repeater receives and retransmits on TS2
+4. Channel B receives repeater output on TS2
 
 ---
 
-## Encrypted DMR Channels
+## DMR Channels
 
-### Channel Pairs
+### Encrypted Channels
 
-| Main Channel (RX/TS2) | TX Channel (TX/TS1) | Frequency | Color Code | Encryption |
-|-----------------------|---------------------|-----------|------------|------------|
-| ENCRYPTED 1           | ENCRYPTED 1 TX      | 451.01250 | 2          | KEY1       |
-| ENCRYPTED 2           | ENCRYPTED 2 TX      | 456.08750 | 4          | KEY2       |
-| ENCRYPTED 3           | ENCRYPTED 3 TX      | 462.11250 | 6          | KEY3       |
-| FRS 22                | FRS 22 TX           | 462.72500 | 10         | None       |
+| Channel | Frequency | Color Code | Encryption |
+|---------|-----------|------------|------------|
+| ENCRYPTED 1 | 451.01250 | 2 | KEY1 |
+| ENCRYPTED 2 | 456.08750 | 4 | KEY2 |
+| ENCRYPTED 3 | 462.11250 | 6 | KEY3 |
+| FRS 22 | 462.72500 | 10 | None |
 
 ### Encryption Keys (AES-256)
 
-| Key Name | Key (Hex)                                                        |
-|----------|------------------------------------------------------------------|
-| KEY1     | `285DAE5A749DE26BDE6B843892A5C58EE935FFE0660C6A19327F05D28B064920` |
-| KEY2     | `2CF0F5D56777697DADD6C9F0EA980E1D100D9709AE172AF3C76CC9EE8E444234` |
-| KEY3     | `0DFAC8681EECFC4FFCE88DBAB6EE48EDF9445DDEE24F7B3FA734D4841BF7BEA0` |
+| Key | Value |
+|-----|-------|
+| KEY1 | `285DAE5A749DE26BDE6B843892A5C58EE935FFE0660C6A19327F05D28B064920` |
+| KEY2 | `2CF0F5D56777697DADD6C9F0EA980E1D100D9709AE172AF3C76CC9EE8E444234` |
+| KEY3 | `0DFAC8681EECFC4FFCE88DBAB6EE48EDF9445DDEE24F7B3FA734D4841BF7BEA0` |
 
-### TimeSlot Summary
+### Radio IDs
 
-| Channel Type | TimeSlot | Purpose |
-|--------------|----------|---------|
-| Main (RX)    | TS2      | Receive from repeater or direct HT |
-| TX-only      | TS1      | Transmit to repeater input |
+| ID | Name | Used By |
+|----|------|---------|
+| 100 | I2Base | AT-D578UV base |
+| 2 | MrSI2 | AT-D578UV / DJN HT |
+| - | I2 | DRN HT |
+| - | LiLI21 | EJD HT |
+| - | LiLI22 | JGN HT |
+| - | LiLI23 | MAN HT |
 
 ---
 
@@ -248,27 +243,32 @@ Modify paths in `scanner_config.json` for your NAS setup:
 
 ```
 AT-D578UV/
-├── d578uv-gui.py          # Desktop GUI application
-├── d578uv-console.py      # Console testing tool
-├── webportal.py           # DigiRig control web portal
-├── rtl_scanner.py         # RTL-SDR scanner backend
-├── scanner_portal.py      # Scanner web portal
-├── audio_streamer.py      # Modular audio streaming (VLC, sox, recording)
-├── scanner_config.json    # Scanner configuration
-├── setup_scanner.sh       # Raspberry Pi setup script
-├── codeplug/
-│   ├── channels.csv       # Channel configuration with TX-only channels
-│   ├── encryption_keys.csv # AES-256 encryption keys
-│   ├── zones.csv          # Zone definitions
-│   ├── scanlist.csv       # Scan list configuration
-│   ├── contacts.csv       # DMR contacts
-│   └── radioid.csv        # Radio ID configuration
-├── DRN_channels.csv       # Legacy channel configuration
-├── DRN.data               # Codeplug binary (encryption keys)
+├── d578uv-gui.py              # Desktop GUI application
+├── d578uv-console.py          # Console testing tool
+├── webportal.py               # DigiRig control web portal
+├── rtl_scanner.py             # RTL-SDR scanner backend
+├── scanner_portal.py          # Scanner web portal
+├── audio_streamer.py          # Modular audio streaming
+├── scanner_config.json        # Scanner configuration
+├── setup_scanner.sh           # Raspberry Pi setup script
+├── codeplug/                  # AT-D578UV codeplug (base station)
+│   ├── channels.csv           # 38 channels, High power
+│   ├── zones.csv              # Zone definitions
+│   ├── scanlist.csv           # Scan list configuration
+│   ├── contacts.csv           # DMR contacts
+│   ├── radioid.csv            # Radio IDs
+│   ├── encryption_keys.csv    # AES-256 keys
+│   ├── CPS_MANUAL_SETTINGS.txt # Manual CPS settings
+│   └── CodeplugSample.rdt     # Sample compiled codeplug
+├── DRN.csv                    # DM-32UV HT codeplug (I2)
+├── DJN.csv                    # DM-32UV HT codeplug (MrSI2)
+├── EJD.csv                    # DM-32UV HT codeplug (LiLI21)
+├── JGN.csv                    # DM-32UV HT codeplug (LiLI22)
+├── MAN.csv                    # DM-32UV HT codeplug (LiLI23)
 ├── templates/
-│   ├── index.html         # DigiRig portal interface
-│   ├── scanner.html       # Scanner portal interface (original)
-│   └── scanner_v2.html    # Scanner portal interface (Rdio Scanner style)
+│   ├── index.html             # DigiRig portal interface
+│   ├── scanner.html           # Scanner portal interface
+│   └── scanner_v2.html        # Scanner v2 interface
 ├── requirements-webportal.txt
 └── requirements-scanner.txt
 ```
@@ -357,46 +357,27 @@ rtl_fm -f 146.52M -M fm -s 24000 -g 40 - | play -r 24000 -t raw -e signed -b 16 
 
 ## Version History
 
-### v2.2.0 - DMR Repeater Timeslot Split
-- Added TX-only channels for repeater operation
-- Implemented DM-32UV firmware bug workaround (no matching RX frequencies)
-- Main channels set to TimeSlot 2 for RX
-- TX channels set to TimeSlot 1 for repeater input
-- Changed DMR MODE from "DCDM TS Split" to "Simplex" for manual timeslot control
+### v2.2.0 - Codeplug Organization
+- Separated AT-D578UV and DM-32UV codeplugs
+- AT-D578UV: Standard channels, High power, no TX-only workaround needed
+- DM-32UV HTs: TX-only channels for firmware bug workaround, Low power
+- Complete codeplug CSVs with zones, scanlists, contacts, radio IDs
 
 ### v2.1.0 - Enhanced Audio Streaming
-- Added `audio_streamer.py` module based on rtl_fm_python, K0NYC/rtl-fm patterns
-- VLC network streaming support (access audio from any device)
+- Added `audio_streamer.py` module
+- VLC network streaming support
 - Real-time signal level monitoring
-- Scanner v2 UI inspired by Rdio Scanner project
-- Professional scanner-style interface with:
-  - Large frequency display with green LED aesthetic
-  - 25-bar signal meter with color gradients
-  - Channel filtering (All/Encrypted/Analog/DMR)
-  - Activity feed and recording management
+- Scanner v2 UI inspired by Rdio Scanner
 
 ### v2.0.0 - RTL-SDR Scanner Portal
-- Added RTL-SDR multi-channel monitoring
-- DMR Basic Privacy decryption support
+- RTL-SDR multi-channel monitoring
+- DMR Basic Privacy decryption
 - Web-based scanner interface
-- Recording and transcription features
-- Raspberry Pi deployment support
-- NAS storage integration
+- Recording and transcription
 
-### v1.0.3
-- Fixed bug with B button
-
-### v1.0.2
-- Added configuration file support
-- Settings window for serial parameters
-- IOCTL improvements for button responsiveness
-
-### v1.0.1
-- Fixed image paths
-- Windows executable release
-
-### v1.0.0
-- Initial release
+### v1.0.0 - Initial Release
+- Software microphone emulator
+- Serial connection via DigiRig
 
 ---
 
