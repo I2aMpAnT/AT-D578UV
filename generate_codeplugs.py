@@ -69,15 +69,10 @@ def main():
     for radio_code, radio_info in RADIOS.items():
         print(f"\n=== {radio_code}: {radio_info['name']} (DMR ID {radio_info['dmr_id']}) - {radio_info['type']} ===")
 
-        # Channels CSV with this radio's ID
-        csv_path = os.path.join(base_dir, f'{radio_code}_channels.csv')
+        # Channels CSV with this radio's ID - just initials.csv
+        csv_path = os.path.join(base_dir, f'{radio_code}.csv')
         generate_channels_csv(channels, radio_info['name'], csv_path)
         print(f"  Created {csv_path}")
-
-        # Radio ID CSV
-        radioid_path = os.path.join(base_dir, f'{radio_code}_radioid.csv')
-        generate_radioid_csv(radio_info, radioid_path)
-        print(f"  Created {radioid_path}")
 
     # Copy zones and scanlist for reference
     print("\n=== Reference files ===")
