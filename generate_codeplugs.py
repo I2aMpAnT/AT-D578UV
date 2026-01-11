@@ -19,15 +19,17 @@ import csv
 import os
 import shutil
 
-# Radio configurations
+# Radio configurations - CSVs for handhelds only, REPEATER uses .rdt
 RADIOS = {
-    'REPEATER': {'name': 'I2Base', 'dmr_id': 100, 'type': 'D578UV'},
     'DRN': {'name': 'I2', 'dmr_id': 101, 'type': 'DM32UV'},
     'DJN': {'name': 'MrSI2', 'dmr_id': 102, 'type': 'DM32UV'},
     'EJD': {'name': 'LiLI21', 'dmr_id': 1, 'type': 'DM32UV'},
     'JGN': {'name': 'LiLI22', 'dmr_id': 2, 'type': 'DM32UV'},
     'MAN': {'name': 'LiLI23', 'dmr_id': 3, 'type': 'DM32UV'},
 }
+
+# REPEATER (D578UV) uses .rdt codeplug, not CSV
+REPEATER = {'name': 'I2Base', 'dmr_id': 100, 'type': 'D578UV'}
 
 def load_channels_csv(csv_path):
     """Load channels from CSV file."""

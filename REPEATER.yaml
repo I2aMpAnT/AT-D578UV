@@ -1,0 +1,484 @@
+# D578UV REPEATER Codeplug
+# Radio: AT-D578UV Pro (I2Base, DMR ID 100)
+# Generated for CPS import via dmrconf
+
+version: 0.11.2
+
+settings:
+  introLine1: I2Base
+  introLine2: REPEATER
+  defaultID: radioid100
+  micLevel: 6
+  speech: false
+  squelch: 1
+  vox: 0
+  power: High
+
+radioIDs:
+  - dmr: {id: radioid100, name: I2Base, number: 100}
+
+contacts:
+  - dmr: {id: teamcall, name: TEAMCALL, type: GroupCall, number: 1}
+
+commercial:
+  encryptionKeys:
+    - aes:
+        id: key1
+        name: KEY1
+        key: 285DAE5A749DE26BDE6B843892A5C58E
+    - aes:
+        id: key2
+        name: KEY2
+        key: 2CF0F5D56777697DADD6C9F0EA980E1D
+    - aes:
+        id: key3
+        name: KEY3
+        key: 0DFAC8681EECFC4FFCE88DBAB6EE48ED
+
+groupLists:
+  - {id: rxgrp1, name: RX Group, contacts: [teamcall]}
+
+scanLists:
+  - id: mainscan
+    name: Main Scan
+    channels: [enc1, enc2, enc3, frs22]
+
+channels:
+  # Encrypted DMR channels
+  - digital:
+      id: enc1
+      name: ENCRYPTED 1
+      rxFrequency: 451.0125
+      txFrequency: 451.0125
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      colorCode: 2
+      timeSlot: TS1
+      groupList: rxgrp1
+      contact: teamcall
+      radioID: radioid100
+      scanList: mainscan
+      anytone:
+        simplexTDMA: true
+  - digital:
+      id: enc2
+      name: ENCRYPTED 2
+      rxFrequency: 456.0875
+      txFrequency: 456.0875
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      colorCode: 4
+      timeSlot: TS1
+      groupList: rxgrp1
+      contact: teamcall
+      radioID: radioid100
+      scanList: mainscan
+      anytone:
+        simplexTDMA: true
+  - digital:
+      id: enc3
+      name: ENCRYPTED 3
+      rxFrequency: 462.1125
+      txFrequency: 462.1125
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      colorCode: 6
+      timeSlot: TS1
+      groupList: rxgrp1
+      contact: teamcall
+      radioID: radioid100
+      scanList: mainscan
+      anytone:
+        simplexTDMA: true
+  - analog:
+      id: frs2
+      name: FRS 2
+      rxFrequency: 462.5875
+      txFrequency: 462.5875
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Narrow
+      scanList: mainscan
+  - digital:
+      id: frs22
+      name: FRS 22
+      rxFrequency: 462.725
+      txFrequency: 462.725
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      colorCode: 10
+      timeSlot: TS1
+      groupList: rxgrp1
+      contact: teamcall
+      radioID: radioid100
+      scanList: mainscan
+      anytone:
+        simplexTDMA: true
+  # Marine channels
+  - analog:
+      id: mar16
+      name: MARINE 16
+      rxFrequency: 156.8
+      txFrequency: 156.8
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: mar9
+      name: MARINE 9
+      rxFrequency: 156.45
+      txFrequency: 156.45
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: uscg22a
+      name: USCG 22A
+      rxFrequency: 157.1
+      txFrequency: 157.1
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: mar68
+      name: MARINE 68
+      rxFrequency: 156.425
+      txFrequency: 156.425
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: mar69
+      name: MARINE 69
+      rxFrequency: 156.475
+      txFrequency: 156.475
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: mar71
+      name: MARINE 71
+      rxFrequency: 156.575
+      txFrequency: 156.575
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: mar72
+      name: MARINE 72
+      rxFrequency: 156.625
+      txFrequency: 156.625
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  # Aviation (RX only)
+  - analog:
+      id: hyatwr
+      name: HYA TWR
+      rxFrequency: 119.5
+      txFrequency: 119.5
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: hyagnd
+      name: HYA GND
+      rxFrequency: 118.45
+      txFrequency: 118.45
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: hyaatis
+      name: HYA ATIS
+      rxFrequency: 123.8
+      txFrequency: 123.8
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: guard
+      name: GUARD
+      rxFrequency: 121.5
+      txFrequency: 121.5
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: unicom
+      name: UNICOM
+      rxFrequency: 122.95
+      txFrequency: 122.95
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  # Public Safety (RX only)
+  - analog:
+      id: bcso
+      name: BCSO
+      rxFrequency: 155.565
+      txFrequency: 155.565
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: brewfd
+      name: BREWSTR FD
+      rxFrequency: 453.55
+      txFrequency: 453.55
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: chatfd
+      name: CHAT FD
+      rxFrequency: 453.375
+      txFrequency: 453.375
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: commfd
+      name: COMM FD
+      rxFrequency: 453.7375
+      txFrequency: 453.7375
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: cotuitfd
+      name: COTUIT FD
+      rxFrequency: 453.3875
+      txFrequency: 453.3875
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: dennisfd
+      name: DENNIS FD
+      rxFrequency: 453.325
+      txFrequency: 453.325
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: easthamfd
+      name: EASTHAM FD
+      rxFrequency: 453.8
+      txFrequency: 453.8
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: harwichfd
+      name: HARWICH FD
+      rxFrequency: 460.55
+      txFrequency: 460.55
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: hyannisfd
+      name: HYANNIS FD
+      rxFrequency: 460.625
+      txFrequency: 460.625
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: orleansfd
+      name: ORLEANS FD
+      rxFrequency: 453.125
+      txFrequency: 453.125
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: ptownfd
+      name: PTOWN FD
+      rxFrequency: 453.275
+      txFrequency: 453.275
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: sandfd
+      name: SAND FD
+      rxFrequency: 460.425
+      txFrequency: 460.425
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: wellflfd
+      name: WELLFL FD
+      rxFrequency: 453.1875
+      txFrequency: 453.1875
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  - analog:
+      id: yarmfd
+      name: YARM FD
+      rxFrequency: 453.15
+      txFrequency: 453.15
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Narrow
+  # NOAA Weather (RX only)
+  - analog:
+      id: noaawx
+      name: NOAA WX
+      rxFrequency: 162.475
+      txFrequency: 162.475
+      power: High
+      timeout: 0
+      rxOnly: true
+      admit: Always
+      bandwidth: Wide
+  # HAM Radio
+  - analog:
+      id: call2m
+      name: 2M CALL
+      rxFrequency: 146.52
+      txFrequency: 146.52
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: simp2m1
+      name: 2M SIMP1
+      rxFrequency: 146.55
+      txFrequency: 146.55
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: simp2m2
+      name: 2M SIMP2
+      rxFrequency: 147.42
+      txFrequency: 147.42
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: call70cm
+      name: 70CM CALL
+      rxFrequency: 446.0
+      txFrequency: 446.0
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: sim70cm1
+      name: 70CM SIM1
+      rxFrequency: 446.5
+      txFrequency: 446.5
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+  - analog:
+      id: sim70cm2
+      name: 70CM SIM2
+      rxFrequency: 447.0
+      txFrequency: 447.0
+      power: High
+      timeout: 0
+      rxOnly: false
+      admit: Always
+      bandwidth: Wide
+
+zones:
+  - id: zoneenc
+    name: ENCRYPTED
+    A: [enc1, enc2, enc3, frs2, frs22]
+  - id: zonemarine
+    name: MARINE
+    A: [mar16, mar9, uscg22a, mar68, mar69, mar71, mar72]
+  - id: zoneaviation
+    name: AVIATION
+    A: [hyatwr, hyagnd, hyaatis, guard, unicom]
+  - id: zonepubsafety
+    name: PUB SAFETY
+    A: [bcso, brewfd, chatfd, commfd, cotuitfd, dennisfd, easthamfd, harwichfd, hyannisfd, orleansfd, ptownfd, sandfd, wellflfd, yarmfd]
+  - id: zonewx
+    name: WEATHER
+    A: [noaawx]
+  - id: zoneham2m
+    name: HAM 2M
+    A: [call2m, simp2m1, simp2m2]
+  - id: zoneham70cm
+    name: HAM 70CM
+    A: [call70cm, sim70cm1, sim70cm2]
