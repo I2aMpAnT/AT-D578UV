@@ -22,10 +22,10 @@ import shutil
 # Each handheld transmits with its own Radio ID
 RADIOS = {
     'DRN': {'name': 'I2Base', 'dmr_id': 100, 'type': 'D578UV'},
-    'DJN': {'name': 'MrSI2', 'dmr_id': 2, 'type': 'DM32UV'},
-    'EJD': {'name': 'LiLI21', 'dmr_id': 3, 'type': 'DM32UV'},
-    'JGN': {'name': 'LiLI22', 'dmr_id': 4, 'type': 'DM32UV'},
-    'MAN': {'name': 'LiLI23', 'dmr_id': 5, 'type': 'DM32UV'},
+    'DJN': {'name': 'MrSI2', 'dmr_id': 102, 'type': 'DM32UV'},
+    'EJD': {'name': 'LiLI21', 'dmr_id': 1, 'type': 'DM32UV'},
+    'JGN': {'name': 'LiLI22', 'dmr_id': 2, 'type': 'DM32UV'},
+    'MAN': {'name': 'LiLI23', 'dmr_id': 3, 'type': 'DM32UV'},
 }
 
 def load_channels_csv(csv_path):
