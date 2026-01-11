@@ -1,9 +1,9 @@
 No.,Channel Name,Channel Type,RX Frequency[MHz],TX Frequency[MHz],Power,Band Width,Scan List,TX Admit,Emergency System,Squelch Level,APRS Report Type,Forbid TX,APRS Receive,Forbid Talkaround,Auto Scan,Lone Work,Emergency Indicator,Emergency ACK,Analog APRS PTT Mode,Digital APRS PTT Mode,TX Contact,RX Group List,Color Code,Time Slot,Encryption,Encryption ID,APRS Report Channel,Direct Dual Mode,Private Confirm,Short Data Confirm,DMR ID,CTC/DCS Decode,CTC/DCS Encode,Scramble,RX Squelch Mode,Signaling Type,PTT ID,VOX Function,PTT ID Display
-1,ENCRYPTED 1,Digital,451.01250,451.01250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,2,Slot 1,1,KEY1,1,0,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
-2,ENCRYPTED 2,Digital,456.08750,456.08750,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,4,Slot 1,1,KEY2,1,0,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
-3,ENCRYPTED 3,Digital,462.11250,462.11250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,6,Slot 1,1,KEY3,1,0,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
+1,ENCRYPTED 1,Digital,451.01250,451.01250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,2,Slot 1,1,KEY1,1,1,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
+2,ENCRYPTED 2,Digital,456.08750,456.08750,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,4,Slot 1,1,KEY2,1,1,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
+3,ENCRYPTED 3,Digital,462.11250,462.11250,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,6,Slot 1,1,KEY3,1,1,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
 4,FRS 2,Analog,462.58750,462.58750,High,12.5KHz,Scan List 1,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
-5,FRS 22,Digital,462.72500,462.72500,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,10,Slot 1,0,None,1,0,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
+5,FRS 22,Digital,462.72500,462.72500,High,12.5KHz,Scan List 1,Always,None,3,Digital,0,1,0,0,0,0,0,0,0,TEAMCALL,RXALL,10,Slot 1,0,None,1,1,1,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
 6,MARINE 16,Analog,156.80000,156.80000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
 7,MARINE 9,Analog,156.45000,156.45000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
 8,USCG 22A,Analog,157.10000,157.10000,High,25KHz,None,Always,None,3,Off,0,0,0,0,0,0,0,0,0,None,None,1,Slot 1,0,None,1,0,0,0,LiLI23,None,None,None,Carrier/CTC,None,OFF,0,0
