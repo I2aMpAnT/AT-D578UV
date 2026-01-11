@@ -15,24 +15,20 @@ This project provides two main components:
 
 ### AT-D578UV (Base Station / Repeater)
 
-The AT-D578UV codeplug is in `codeplug/` folder. Import CSVs into AnyTone CPS software.
+The AT-D578UV codeplug is in `codeplug/` folder. Open `I2Base.db3` directly in AnyTone CPS.
 
 **Files:**
 | File | Description |
 |------|-------------|
-| `channels.csv` | 38 channels (High power) |
-| `zones.csv` | Zone definitions |
-| `scanlist.csv` | Scan list configuration |
-| `contacts.csv` | DMR contacts |
-| `radioid.csv` | Radio IDs (I2Base, MrSI2) |
-| `encryption_keys.csv` | AES-256 keys |
-| `CPS_MANUAL_SETTINGS.txt` | Settings that must be configured manually in CPS |
+| `I2Base.db3` | Complete CPS project file (38 channels, 6 Radio IDs) |
+| `CPS_MANUAL_SETTINGS.txt` | Manual configuration guide |
+| `CodeplugSample.rdt` | Minimal sample (reference only) |
 
-**Import Order:**
-1. Tool > Import > Channel > `channels.csv`
-2. Tool > Import > Zone > `zones.csv`
-3. Tool > Import > Scan List > `scanlist.csv`
-4. Manual: Add Radio IDs, Encryption Keys, P-Key assignments (see `CPS_MANUAL_SETTINGS.txt`)
+**Quick Start:**
+1. File > Open > `I2Base.db3`
+2. Add encryption keys manually (see `CPS_MANUAL_SETTINGS.txt`)
+3. Assign keys to ENCRYPTED 1-3 channels
+4. Configure P-key assignments
 5. Program > Write to Radio
 
 ### DM-32UV Handhelds
@@ -252,14 +248,10 @@ AT-D578UV/
 ├── scanner_config.json        # Scanner configuration
 ├── setup_scanner.sh           # Raspberry Pi setup script
 ├── codeplug/                  # AT-D578UV codeplug (base station)
-│   ├── channels.csv           # 38 channels, High power
-│   ├── zones.csv              # Zone definitions
-│   ├── scanlist.csv           # Scan list configuration
-│   ├── contacts.csv           # DMR contacts
-│   ├── radioid.csv            # Radio IDs
-│   ├── encryption_keys.csv    # AES-256 keys
+│   ├── I2Base.db3             # Main CPS project (38 ch, 6 Radio IDs)
 │   ├── CPS_MANUAL_SETTINGS.txt # Manual CPS settings
-│   └── CodeplugSample.rdt     # Sample compiled codeplug
+│   ├── CodeplugSample.rdt     # Minimal sample (reference)
+│   └── README.txt             # Codeplug instructions
 ├── DRN.csv                    # DM-32UV HT codeplug (I2)
 ├── DJN.csv                    # DM-32UV HT codeplug (MrSI2)
 ├── EJD.csv                    # DM-32UV HT codeplug (LiLI21)

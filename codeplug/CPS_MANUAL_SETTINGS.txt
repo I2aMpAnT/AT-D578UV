@@ -1,13 +1,24 @@
 D578UV CPS MANUAL CONFIGURATION
 ================================
-These settings must be configured manually in CPS (not CSV importable)
+Use I2Base.db3 as the CPS project file. It contains:
+- All 38 channels (HIGH power)
+- All 6 Radio IDs pre-configured
+- MAIN zone with all channels
+
+Only these settings need manual configuration in CPS:
 
 =====================================
-1. RADIO ID LIST
+1. RADIO ID LIST (ALREADY CONFIGURED)
 =====================================
-Optional Setting > Radio ID List
-- ID 1: I2Base
-- ID 2: MrSI2
+I2Base.db3 already has all 6 Radio IDs configured:
+- ID 1: I2Base (DMR ID 100) - AT-D578UV base station
+- ID 2: I2 (DMR ID 101) - DRN HT
+- ID 3: MrSI2 (DMR ID 102) - DJN HT
+- ID 4: LiLI21 (DMR ID 1) - EJD HT
+- ID 5: LiLI22 (DMR ID 2) - JGN HT
+- ID 6: LiLI23 (DMR ID 3) - MAN HT
+
+Verify at: Optional Setting > Radio ID List
 
 =====================================
 2. ENCRYPTION KEYS (AES-256)
@@ -82,14 +93,15 @@ Optional Setting > Power On
 - Set startup channel to ENCRYPTED 1
 
 =====================================
-IMPORT ORDER IN CPS:
+HOW TO USE I2Base.db3:
 =====================================
-1. Tool > Import > Channel > channels.csv
-2. Tool > Import > Zone > zones.csv
-3. Tool > Import > Scan List > scanlist.csv
-4. Manual: Add Radio IDs (section 1)
-5. Manual: Add Encryption Keys (section 2)
-6. Manual: Assign keys to channels 1-3
-7. Manual: P-Key assignments (section 3)
-8. Manual: Repeater settings (section 4)
-9. Program > Write to Radio
+1. File > Open > I2Base.db3
+2. Manual: Add Encryption Keys (section 2)
+3. Manual: Assign keys to channels ENCRYPTED 1-3
+4. Manual: P-Key assignments (section 3)
+5. Manual: Repeater settings (section 4)
+6. Manual: Scan settings (section 5)
+7. Program > Write to Radio
+
+Note: Channels, Radio IDs, and zones are already configured.
+The CodeplugSample.rdt is a minimal sample for reference only.
