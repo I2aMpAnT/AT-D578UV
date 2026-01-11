@@ -5,12 +5,12 @@ DO NOT DELETE - This file contains the correct radio configurations
 === DMR IDs (from CPS screenshot) ===
 No. | ID  | Name   | Radio
 ----|-----|--------|------
-1   | 101 | I2     | DRN (D578UV base)
+1   | 101 | I2     | DRN (DM32UV)
 2   | 102 | MrSI2  | DJN (DM32UV)
 3   | 1   | LiLI21 | EJD (DM32UV)
 4   | 2   | LiLI22 | JGN (DM32UV)
 5   | 3   | LiLI23 | MAN (DM32UV)
-6   | 100 | I2Base | REPEATER
+6   | 100 | I2Base | REPEATER (D578UV)
 
 === Channel Settings ===
 ENCRYPTED 1: CC=2,  KEY1, DCDM TS Split

@@ -2,14 +2,15 @@
 """
 Generate channel CSVs for multiple radios.
 
-Base Station (D578UV):
-- DRN: I2Base (DMR ID 100)
+REPEATER (D578UV):
+- I2Base (DMR ID 100)
 
 Handhelds (DM32UV):
-- DJN: MrSI2 (DMR ID 2)
-- EJD: LiLI21 (DMR ID 3)
-- JGN: LiLI22 (DMR ID 4)
-- MAN: LiLI23 (DMR ID 5)
+- DRN: I2 (DMR ID 101)
+- DJN: MrSI2 (DMR ID 102)
+- EJD: LiLI21 (DMR ID 1)
+- JGN: LiLI22 (DMR ID 2)
+- MAN: LiLI23 (DMR ID 3)
 
 The only difference between CSVs is the Radio ID used for transmitting.
 """
@@ -21,7 +22,7 @@ import shutil
 # Radio configurations
 # Each handheld transmits with its own Radio ID
 RADIOS = {
-    'DRN': {'name': 'I2', 'dmr_id': 101, 'type': 'D578UV'},
+    'DRN': {'name': 'I2', 'dmr_id': 101, 'type': 'DM32UV'},
     'DJN': {'name': 'MrSI2', 'dmr_id': 102, 'type': 'DM32UV'},
     'EJD': {'name': 'LiLI21', 'dmr_id': 1, 'type': 'DM32UV'},
     'JGN': {'name': 'LiLI22', 'dmr_id': 2, 'type': 'DM32UV'},
