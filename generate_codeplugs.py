@@ -20,8 +20,8 @@ import os
 import shutil
 
 # Radio configurations
-# Each handheld transmits with its own Radio ID
 RADIOS = {
+    'REPEATER': {'name': 'I2Base', 'dmr_id': 100, 'type': 'D578UV'},
     'DRN': {'name': 'I2', 'dmr_id': 101, 'type': 'DM32UV'},
     'DJN': {'name': 'MrSI2', 'dmr_id': 102, 'type': 'DM32UV'},
     'EJD': {'name': 'LiLI21', 'dmr_id': 1, 'type': 'DM32UV'},
