@@ -85,7 +85,7 @@ The DM-32UV HTs have a **firmware bug** that blocks channels with matching RX fr
 |----|------|---------|
 | 100 | I2Base | AT-D578UV base |
 | 101 | I2 | DRN HT |
-| 102 | MrSI2 | AT-D578UV / DJN HT |
+| 102 | MrSI2 | DJN HT |
 | 1 | LiLI21 | EJD HT |
 | 2 | LiLI22 | JGN HT |
 | 3 | LiLI23 | MAN HT |
