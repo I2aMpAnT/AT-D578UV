@@ -56,7 +56,7 @@ The DM-32UV handheld firmware has a bug that **blocks channels with matching RX 
 ### Radio Operation
 
 1. **Set Channel B** to the main channel (e.g., "ENCRYPTED 1") - this is your RX channel on TS2
-2. **Set Channel A** to the corresponding TX channel (e.g., "ENC 1 TX") - this is your TX channel on TS1
+2. **Set Channel A** to the corresponding TX channel (e.g., "ENCRYPTED 1 TX") - this is your TX channel on TS1
 3. PTT transmits on Channel A (TS1) → Repeater receives and retransmits on TS2
 4. Channel B receives the repeater's transmission on TS2
 
@@ -75,9 +75,9 @@ The repeater must be configured to:
 
 | Main Channel (RX/TS2) | TX Channel (TX/TS1) | Frequency | Color Code | Encryption |
 |-----------------------|---------------------|-----------|------------|------------|
-| ENCRYPTED 1           | ENC 1 TX            | 451.01250 | 2          | KEY1       |
-| ENCRYPTED 2           | ENC 2 TX            | 456.08750 | 4          | KEY2       |
-| ENCRYPTED 3           | ENC 3 TX            | 462.11250 | 6          | KEY3       |
+| ENCRYPTED 1           | ENCRYPTED 1 TX      | 451.01250 | 2          | KEY1       |
+| ENCRYPTED 2           | ENCRYPTED 2 TX      | 456.08750 | 4          | KEY2       |
+| ENCRYPTED 3           | ENCRYPTED 3 TX      | 462.11250 | 6          | KEY3       |
 | FRS 22                | FRS 22 TX           | 462.72500 | 10         | None       |
 
 ### Encryption Keys (AES-256)
